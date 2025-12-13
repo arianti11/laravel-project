@@ -16,19 +16,20 @@
 
         <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500&display=swap" rel="stylesheet">
 
-        <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/bootstrap-icons.css') }}" rel="stylesheet">
-        <link href="{{ asset('css/templatemo-barber-shop.css') }}" rel="stylesheet">
+        <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ asset('assets/css/bootstrap-icons.css') }}" rel="stylesheet">
+        <link href="{{ asset('assets/css/templatemo-barber-shop.css') }}" rel="stylesheet">
 
         <!-- Debug: tampilkan URL asset di HTML comment -->
-        <!-- CSS URLs: {{ asset('css/bootstrap.min.css') }}, {{ asset('css/bootstrap-icons.css') }}, {{ asset('css/templatemo-barber-shop.css') }} -->
+        CSS URLs: {{ asset('assets/css/bootstrap.min.css') }}, {{ asset('assets/css/bootstrap-icons.css') }}, {{ asset('assets/css/templatemo-barber-shop.css') }}
 
         <!-- Fallback & runtime check: jika custom CSS tidak terdeteksi, inject Bootstrap CDN & icon CDN -->
+
         <script>
             console.log('Assets:', {
-                bootstrap: "{{ asset('css/bootstrap.min.css') }}",
-                icons: "{{ asset('css/bootstrap-icons.css') }}",
-                custom: "{{ asset('css/templatemo-barber-shop.css') }}"
+                bootstrap: "{{ asset('assets/css/bootstrap.min.css') }}",
+                icons: "{{ asset('assets/css/bootstrap-icons.css') }}",
+                custom: "{{ asset('assets/css/templatemo-barber-shop.css') }}"
             });
             (function(){
                 var customFound = false;
@@ -72,7 +73,7 @@
 
                     <div class="position-sticky sidebar-sticky d-flex flex-column justify-content-center align-items-center">
                         <a class="navbar-brand" href="{{ url('/') }}">
-                            <img src="{{ asset('images/templatemo-barber-logo.png') }}" class="logo-image img-fluid" align="">
+                            <img src="{{ asset('assets/images/templatemo-barber-logo.png') }}" class="logo-image img-fluid" align="">
                         </a>
 
                         <ul class="nav flex-column">
@@ -117,7 +118,7 @@
                             </div>
 
                             <div class="custom-block d-lg-flex flex-column justify-content-center align-items-center">
-                                <img src="{{ asset('images/vintage-chair-barbershop.jpg') }}" class="custom-block-image img-fluid" alt="">
+                                <img src="{{ asset('assets/images/vintage-chair-barbershop.jpg') }}" class="custom-block-image img-fluid" alt="">
 
                                 <h4><strong class="text-white">Hurry Up! Get good haircut.</strong></h4>
 
@@ -141,7 +142,7 @@
                                     <h6 class="mb-5">Meet Babers</h6>
 
                                         <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap me-lg-5 mb-5 mb-lg-0">
-                                            <img src="{{ asset('images/barber/portrait-male-hairdresser-with-scissors.jpg') }}" class="custom-block-bg-overlay-image img-fluid" alt="">
+                                            <img src="{{ asset('assets/images/barber/portrait-male-hairdresser-with-scissors.jpg') }}" class="custom-block-bg-overlay-image img-fluid" alt="">
 
                                             <div class="team-info d-flex align-items-center flex-wrap">
                                                 <p class="mb-0">Redo</p>
@@ -166,7 +167,7 @@
                                         </div>
 
                                         <div class="col-lg-5 col-12 custom-block-bg-overlay-wrap mt-4 mt-lg-0 mb-5 mb-lg-0">
-                                            <img src="{{ asset('images/barber/portrait-mid-adult-bearded-male-barber-with-folded-arms.jpg') }}" class="custom-block-bg-overlay-image img-fluid" alt="">
+                                            <img src="{{ asset('assets/images/barber/portrait-mid-adult-bearded-male-barber-with-folded-arms.jpg') }}" class="custom-block-bg-overlay-image img-fluid" alt="">
 
                                             <div class="team-info d-flex align-items-center flex-wrap">
                                                 <p class="mb-0">Sam</p>
@@ -218,7 +219,7 @@
 
                                 <div class="col-lg-6 col-12 mb-4">
                                     <div class="services-thumb">
-                                        <img src="{{ asset('images/services/woman-cutting-hair-man-salon.jpg') }}" class="services-image img-fluid" alt="">
+                                        <img src="{{ asset('assets/images/services/woman-cutting-hair-man-salon.jpg') }}" class="services-image img-fluid" alt="">
 
                                         <div class="services-info d-flex align-items-end">
                                             <h4 class="mb-0">Hair cut</h4>
@@ -230,7 +231,7 @@
 
                                 <div class="col-lg-6 col-12 mb-4">
                                     <div class="services-thumb">
-                                        <img src="{{ asset('images/services/hairdresser-grooming-their-client.jpg') }}" class="services-image img-fluid" alt="">
+                                        <img src="{{ asset('assets/images/services/hairdresser-grooming-their-client.jpg') }}" class="services-image img-fluid" alt="">
 
                                         <div class="services-info d-flex align-items-end">
                                             <h4 class="mb-0">Washing</h4>
@@ -254,7 +255,7 @@
 
                                 <div class="col-lg-6 col-12">
                                     <div class="services-thumb">
-                                        <img src="{{ asset('images/services/boy-getting-haircut-salon-front-view.jpg') }}" class="services-image img-fluid" alt="">
+                                        <img src="{{ asset('assets/images/services/boy-getting-haircut-salon-front-view.jpg') }}" class="services-image img-fluid" alt="">
 
                                         <div class="services-info d-flex align-items-end">
                                             <h4 class="mb-0">Kids</h4>
@@ -385,7 +386,7 @@
                                 </div>
 
                                 <div class="col-lg-4 col-12 custom-block-bg-overlay-wrap mt-5 mb-5 mb-lg-0 mt-lg-0 pt-3 pt-lg-0">
-                                    <img src="{{ asset('images/vintage-chair-barbershop.jpg') }}" class="custom-block-bg-overlay-image img-fluid" alt="">
+                                    <img src="{{ asset('assets/images/vintage-chair-barbershop.jpg') }}" class="custom-block-bg-overlay-image img-fluid" alt="">
                                 </div>
 
                             </div>
@@ -528,10 +529,10 @@
             </div>
 
         <!-- JAVASCRIPT FILES -->
-        <script src="{{ asset('js/jquery.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/click-scroll.js') }}"></script>
-        <script src="{{ asset('js/custom.js') }}"></script>
+        <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+        <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+        <script src="{{ asset('assets/js/click-scroll.js') }}"></script>
+        <script src="{{ asset('assets/js/custom.js') }}"></script>
 
         <!-- Small runtime check for JS asset 404s -->
         <script>
