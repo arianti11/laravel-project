@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kerajinan Tangan UMKM - Handmade with Love</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Custom CSS -->
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
@@ -39,7 +41,7 @@
                         <a class="nav-link" href="#kontak">Kontak</a>
                     </li>
                     <li class="nav-item ms-3">
-                        <a href="login.html" class="btn btn-primary-custom">Masuk</a>
+                        <a href="{{ route('login') }}" class="btn btn-primary-custom">Masuk</a>
                     </li>
                 </ul>
             </div>
@@ -52,7 +54,8 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1>Kerajinan Tangan<br>Dibuat dengan <span style="color: var(--primary);">❤️ Cinta</span></h1>
-                    <p>Temukan koleksi kerajinan tangan unik dan berkualitas dari pengrajin lokal Indonesia. Setiap produk dibuat dengan penuh perhatian dan dedikasi.</p>
+                    <p>Temukan koleksi kerajinan tangan unik dan berkualitas dari pengrajin lokal Indonesia. Setiap
+                        produk dibuat dengan penuh perhatian dan dedikasi.</p>
                     <a href="#produk" class="btn btn-primary-custom me-3">
                         <i class="fas fa-shopping-bag me-2"></i>Lihat Produk
                     </a>
@@ -62,7 +65,8 @@
                 </div>
                 <div class="col-lg-6 text-center">
                     <div class="hero-image">
-                        <i class="fas fa-hand-holding-heart" style="font-size: 15rem; color: var(--secondary); opacity: 0.3;"></i>
+                        <i class="fas fa-hand-holding-heart"
+                            style="font-size: 15rem; color: var(--secondary); opacity: 0.3;"></i>
                     </div>
                 </div>
             </div>
@@ -83,7 +87,8 @@
                             <i class="fas fa-hands"></i>
                         </div>
                         <h4>100% Handmade</h4>
-                        <p>Setiap produk dibuat dengan tangan oleh pengrajin berpengalaman, menjamin kualitas dan keunikan.</p>
+                        <p>Setiap produk dibuat dengan tangan oleh pengrajin berpengalaman, menjamin kualitas dan
+                            keunikan.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -215,9 +220,8 @@
         <div class="container">
             <h2>Siap Memulai Bisnis Kerajinan Anda?</h2>
             <p class="mb-4">Bergabunglah dengan komunitas pengrajin kami dan mulai jual produk Anda hari ini!</p>
-            <a href="register.html" class="btn btn-light-custom">
-                <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
-            </a>
+            <a href="{{ route('register') }}" class="btn btn-light-custom">
+                <i class="fas fa-user-plus me-2"></i>Daftar Sekarang</a>
         </div>
     </section>
 
@@ -262,8 +266,9 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Custom JS -->
     <script src="assets/js/script.js"></script>
 </body>
+
 </html>

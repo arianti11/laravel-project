@@ -8,42 +8,56 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Membuat tabel users untuk menyimpan data pengguna
      */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
+            // ID (Primary Key) - Auto Increment
             $table->id();
+            
+            // Nama Lengkap - Wajib diisi
             $table->string('name');
+            
+            // Email - Wajib diisi, unik (tidak boleh sama)
             $table->string('email')->unique();
+            
+            // Nomor Telepon - Opsional
+            $table->string('phone', 15)->nullable();
+            
+            // Email Verified At - Untuk verifikasi email
             $table->timestamp('email_verified_at')->nullable();
+            
+            // Password - Wajib diisi (akan di-hash)
             $table->string('password');
+            
+            // Role - Admin atau User
+            // Default = user
+            $table->enum('role', ['admin', 'user'])->default('user');
+            
+            // Avatar/Foto Profil - Opsional
+            $table->string('avatar')->nullable();
+            
+            // Status Aktif - Default aktif (1)
+            $table->boolean('is_active')->default(true);
+            
+            // Remember Token - Untuk "Remember Me" saat login
             $table->rememberToken();
+            
+            // Timestamps - created_at & updated_at
             $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            
+            // Soft Delete
+            $table->softDeletes();
         });
     }
 
     /**
      * Reverse the migrations.
+     * Menghapus tabel users
      */
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('sessions');
     }
 };
