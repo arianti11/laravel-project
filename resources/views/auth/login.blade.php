@@ -99,6 +99,7 @@
 
                             <!-- Submit Button -->
                             <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                                
                                 <i class="fas fa-sign-in-alt me-2"></i>Masuk
                             </button>
 
@@ -124,7 +125,7 @@
                             <!-- Register Link -->
                             <p class="text-center mb-0">
                                 Belum punya akun? 
-                                <a href="register.html" class="text-decoration-none fw-semibold" style="color: var(--primary);">
+                                <a href="{{ route('register') }}" class="text-decoration-none fw-semibold" style="color: var(--primary);">
                                     Daftar Sekarang
                                 </a>
                             </p>

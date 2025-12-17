@@ -160,7 +160,7 @@
                             <!-- Login Link -->
                             <p class="text-center mb-0">
                                 Sudah punya akun? 
-                                <a href="login.html" class="text-decoration-none fw-semibold" style="color: var(--primary);">
+                                <a href="{{ route('login') }}" class="text-decoration-none fw-semibold" style="color: var(--primary);">
                                     Masuk Sekarang
                                 </a>
                             </p>

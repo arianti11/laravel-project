@@ -230,7 +230,7 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5 class="mb-3">KraftiQu</h5>
-                    <p class="text-muted">Platform manajemen produk untuk UMKM kerajinan tangan Indonesia.</p>
+                    <p class="mb-2">Platform manajemen produk untuk UMKM kerajinan tangan Indonesia.</p>
                     <div class="social-icons mt-3">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
@@ -249,14 +249,14 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5 class="mb-3">Kontak</h5>
-                    <p class="text-muted">
+                    <p class="list-unstyled">
                         <i class="fas fa-map-marker-alt me-2"></i>Pekanbaru, Riau<br>
                         <i class="fas fa-phone me-2"></i>+62 812-3456-7890<br>
                         <i class="fas fa-envelope me-2"></i>info@kraftiqu.com
                     </p>
                 </div>
             </div>
-            <hr style="border-color: rgba(255,255,255,0.1);">
+            <hr style="border-color: rgba(250, 250, 250, 1);">
             <div class="text-center text-muted">
                 <p class="mb-0">&copy; 2024 KraftiQu. Made with ❤️ in Indonesia</p>
             </div>
