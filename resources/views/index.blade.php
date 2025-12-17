@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kerajinan Tangan UMKM - Handmade with Love</title>
+    <title>Kerajinan Tangan UMKM - Handmad</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
@@ -21,8 +21,7 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-hand-sparkles"></i> KraftiQu
-            </a>
+                <i class="fas fa-hand-sparkles"></i> KraftiQu</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -32,10 +31,10 @@
                         <a class="nav-link" href="#beranda">Beranda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#produk">Produk</a>
+                        <a class="nav-link" href="#tentang">Tentang</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#tentang">Tentang</a>
+                        <a class="nav-link" href="#produk">Produk</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#kontak">Kontak</a>
@@ -53,7 +52,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1>Kerajinan Tangan<br>Dibuat dengan <span style="color: var(--primary);">❤️ Cinta</span></h1>
+                    <h1>Kerajinan Tangan<br>Dibuat dengan <span style="color: var(--primary);">penuh hati</span></h1>
                     <p>Temukan koleksi kerajinan tangan unik dan berkualitas dari pengrajin lokal Indonesia. Setiap
                         produk dibuat dengan penuh perhatian dan dedikasi.</p>
                     <a href="#produk" class="btn btn-primary-custom me-3">
