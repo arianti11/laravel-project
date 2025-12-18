@@ -1,0 +1,44 @@
+:root {
+            --cui-primary: #8B6F47;
+            --cui-primary-rgb: 139, 111, 71;
+        }
+        
+        .sidebar {
+            --cui-sidebar-bg: #2d3748;
+            --cui-sidebar-nav-link-color: #cbd5e0;
+            --cui-sidebar-nav-link-hover-bg: rgba(139, 111, 71, 0.1);
+            --cui-sidebar-nav-link-hover-color: #8B6F47;
+            --cui-sidebar-nav-link-active-bg: #8B6F47;
+            --cui-sidebar-nav-link-active-color: #ffffff;
+        }
+        
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .sidebar-brand {
+            background: #1a202c;
+            color: #8B6F47;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .btn-primary {
+            background-color: #8B6F47;
+            border-color: #8B6F47;
+        }
+        
+        .btn-primary:hover {
+            background-color: #6d5637;
+            border-color: #6d5637;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+        
+        .stats-card {
+            border-left: 4px solid #8B6F47;
+        }
