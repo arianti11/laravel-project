@@ -10,34 +10,62 @@ use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    // Menampilkan halaman register
+    /**
+     * Menampilkan halaman register
+     */
     public function showRegisterForm()
     {
         return view('auth.register');
     }
 
-    // Proses register
+    /**
+     * Proses register
+     */
     public function register(Request $request)
     {
+        // Debug: Cek data yang dikirim
+        // dd($request->all());
+        
         // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'phone' => 'required|string|min:10|max:15',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'name.required' => 'Nama wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah terdaftar',
+            'phone.required' => 'Nomor telepon wajib diisi',
+            'phone.min' => 'Nomor telepon minimal 10 digit',
+            'password.required' => 'Password wajib diisi',
+            'password.min' => 'Password minimal 8 karakter',
+            'password.confirmed' => 'Konfirmasi password tidak cocok',
         ]);
 
-        // Buat user baru
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            // Buat user baru
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'password' => Hash::make($validated['password']),
+                'role' => 'user', // Default role
+            ]);
 
-        // Auto login setelah register
-        Auth::login($users);
+            // Auto login setelah register
+            Auth::login($user);
 
-        return redirect('/dashboard')->with('success', 'Registrasi berhasil!');
+            // Redirect ke dashboard dengan pesan sukses
+            return redirect()->route('admin.dashboard')
+                ->with('success', 'Registrasi berhasil! Selamat datang, ' . $user->name);
+                
+        } catch (\Exception $e) {
+            // Kalau ada error, tampilkan pesan error
+            return back()->withErrors([
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 }

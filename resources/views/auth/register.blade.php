@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
-    <link href="assets/css/auth.css" rel="stylesheet">
+    <link href="{{ asset('assets/css/auth.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="auth-container">
@@ -21,7 +21,7 @@
             <div class="col-lg-6 d-none d-lg-block auth-left">
                 <div class="auth-left-content">
                     <div class="logo-container">
-                        <a href="index.html" class="text-white text-decoration-none">
+                        <a href="{{ url('/') }}" class="text-white text-decoration-none">
                             <h2><i class="fas fa-hand-sparkles"></i> KraftiQu</h2>
                         </a>
                     </div>
@@ -39,7 +39,7 @@
                     <div class="auth-form-container">
                         <!-- Mobile Logo -->
                         <div class="d-lg-none text-center mb-4">
-                            <a href="index.html" class="text-decoration-none">
+                            <a href="{{ url('/') }}" class="text-decoration-none">
                                 <h3 style="color: var(--primary);">
                                     <i class="fas fa-hand-sparkles"></i> KraftiQu
                                 </h3>
@@ -49,14 +49,30 @@
                         <h2 class="auth-title">Buat Akun Baru 🎨</h2>
                         <p class="auth-subtitle">Isi data diri Anda untuk mendaftar</p>
 
-                        <!-- Alert (Hidden by default) -->
-                        <div class="alert alert-danger d-none" id="errorAlert">
+                        <!-- Alert Error -->
+                        @if($errors->any())
+                        <div class="alert alert-danger">
                             <i class="fas fa-exclamation-circle me-2"></i>
-                            <span id="errorMessage"></span>
+                            <strong>Terjadi kesalahan:</strong>
+                            <ul class="mb-0 mt-2">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
+                        @endif
+
+                        @if(session('success'))
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            {{ session('success') }}
+                        </div>
+                        @endif
 
                         <!-- Register Form -->
-                        <form id="registerForm">
+                        <form action="{{ route('register') }}" method="POST">
+                            @csrf
+                            
                             <!-- Nama Lengkap -->
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nama Lengkap</label>
@@ -64,9 +80,17 @@
                                     <span class="input-icon">
                                         <i class="fas fa-user"></i>
                                     </span>
-                                    <input type="text" class="form-control form-control-custom" id="name" 
-                                           placeholder="Nama lengkap Anda" required>
+                                    <input type="text" 
+                                           class="form-control form-control-custom @error('name') is-invalid @enderror" 
+                                           id="name" 
+                                           name="name"
+                                           value="{{ old('name') }}"
+                                           placeholder="Nama lengkap Anda" 
+                                           required>
                                 </div>
+                                @error('name')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <!-- Email -->
@@ -76,9 +100,17 @@
                                     <span class="input-icon">
                                         <i class="fas fa-envelope"></i>
                                     </span>
-                                    <input type="email" class="form-control form-control-custom" id="email" 
-                                           placeholder="nama@email.com" required>
+                                    <input type="email" 
+                                           class="form-control form-control-custom @error('email') is-invalid @enderror" 
+                                           id="email" 
+                                           name="email"
+                                           value="{{ old('email') }}"
+                                           placeholder="nama@email.com" 
+                                           required>
                                 </div>
+                                @error('email')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <!-- No. Telepon -->
@@ -88,38 +120,58 @@
                                     <span class="input-icon">
                                         <i class="fas fa-phone"></i>
                                     </span>
-                                    <input type="tel" class="form-control form-control-custom" id="phone" 
-                                           placeholder="08xxxxxxxxxx" required>
+                                    <input type="tel" 
+                                           class="form-control form-control-custom @error('phone') is-invalid @enderror" 
+                                           id="phone" 
+                                           name="phone"
+                                           value="{{ old('phone') }}"
+                                           placeholder="08xxxxxxxxxx" 
+                                           required>
                                 </div>
+                                @error('phone')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
+                                <small class="text-muted">Contoh: 08123456789</small>
                             </div>
 
                             <!-- Password -->
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <div class="input-group">
+                                <div class="input-group position-relative">
                                     <span class="input-icon">
                                         <i class="fas fa-lock"></i>
                                     </span>
-                                    <input type="password" class="form-control form-control-custom" id="password" 
-                                           placeholder="Minimal 8 karakter" required>
-                                    <button class="btn-toggle-password" type="button" id="togglePassword">
-                                        <i class="fas fa-eye"></i>
+                                    <input type="password" 
+                                           class="form-control form-control-custom @error('password') is-invalid @enderror" 
+                                           id="password" 
+                                           name="password"
+                                           placeholder="Minimal 8 karakter" 
+                                           required>
+                                    <button class="btn-toggle-password" type="button" onclick="togglePassword()">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
                                     </button>
                                 </div>
+                                @error('password')
+                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                @enderror
                                 <small class="text-muted">Password minimal 8 karakter</small>
                             </div>
 
                             <!-- Confirm Password -->
                             <div class="mb-3">
                                 <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                                <div class="input-group">
+                                <div class="input-group position-relative">
                                     <span class="input-icon">
                                         <i class="fas fa-lock"></i>
                                     </span>
-                                    <input type="password" class="form-control form-control-custom" id="password_confirmation" 
-                                           placeholder="Ulangi password" required>
-                                    <button class="btn-toggle-password" type="button" id="togglePasswordConfirm">
-                                        <i class="fas fa-eye"></i>
+                                    <input type="password" 
+                                           class="form-control form-control-custom" 
+                                           id="password_confirmation" 
+                                           name="password_confirmation"
+                                           placeholder="Ulangi password" 
+                                           required>
+                                    <button class="btn-toggle-password" type="button" onclick="togglePasswordConfirm()">
+                                        <i class="fas fa-eye" id="toggleIconConfirm"></i>
                                     </button>
                                 </div>
                             </div>
@@ -174,7 +226,37 @@
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom JS -->
-    <script src="assets/js/auth.js"></script>
+    <!-- Toggle Password -->
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        function togglePasswordConfirm() {
+            const passwordInput = document.getElementById('password_confirmation');
+            const toggleIcon = document.getElementById('toggleIconConfirm');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>
