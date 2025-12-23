@@ -21,34 +21,31 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        // Validasi input
+        // Validasi
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:8',
-        ], [
-            'email.required' => 'Email wajib diisi',
-            'email.email' => 'Format email tidak valid',
-            'password.required' => 'Password wajib diisi',
-            'password.min' => 'Password minimal 8 karakter',
         ]);
 
-        // Coba login
         $credentials = $request->only('email', 'password');
         $remember = $request->has('remember');
 
         if (Auth::attempt($credentials, $remember)) {
-            // Login berhasil
             $request->session()->regenerate();
-            
-            // Redirect ke dashboard
-            return redirect()->intended(route('admin.dashboard'))
-                ->with('success', 'Selamat datang, ' . auth()->user()->name . '!');
+
+            // Redirect berdasarkan role
+            if (auth()->user()->isAdmin()) {
+                return redirect()->route('admin.dashboard')
+                    ->with('success', 'Selamat datang, Admin ' . auth()->user()->name . '!');
+            } else {
+                return redirect()->route('user.dashboard')
+                    ->with('success', 'Selamat datang, ' . auth()->user()->name . '!');
+            }
         }
 
-        // Login gagal
         return back()->withErrors([
             'email' => 'Email atau password salah.',
-        ])->withInput($request->only('email'));
+        ])->withInput();
     }
 
     /**
@@ -57,7 +54,7 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

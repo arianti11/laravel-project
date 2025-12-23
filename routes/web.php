@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\User\UserDashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,41 +50,60 @@ Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth');
 
 // ==========================================
-// ADMIN ROUTES (Perlu Login)
+// ADMIN ROUTES (Perlu Login + Role Admin)
 // ==========================================
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'admin'])
     ->group(function () {
-
-        // Dashboard
+        
+        // Dashboard Admin
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
-
+        
         // Categories CRUD
         Route::resource('categories', CategoryController::class);
-
+        
         // Products CRUD
         Route::resource('products', ProductController::class);
-
+        
+        // Delete product image
+        Route::delete('/products/images/{image}', [ProductController::class, 'deleteImage'])
+            ->name('products.images.delete');
+        
         // Users Management
         Route::resource('users', UserController::class);
+    });
 
-        // Di dalam Route::prefix('admin')->group()
-        Route::delete('/products/images/{image}', [ProductController::class, 'deleteImage'])
-            ->name('admin.products.images.delete');
+// ==========================================
+// USER ROUTES (Perlu Login, Role User Biasa)
+// ==========================================
 
-        // Additional Routes (nanti bisa ditambahkan)
-        // Route::get('/reports', [ReportController::class, 'index'])->name('reports');
-        // Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+Route::prefix('user')
+    ->name('user.')
+    ->middleware(['auth'])
+    ->group(function () {
+        
+        // Dashboard User
+        Route::get('/dashboard', [UserDashboardController::class, 'index'])
+            ->name('dashboard');
+        
+        // Profile
+        Route::get('/profile', [UserDashboardController::class, 'profile'])
+            ->name('profile');
+        
+        Route::put('/profile', [UserDashboardController::class, 'updateProfile'])
+            ->name('profile.update');
     });
 
 // ==========================================
 // REDIRECT SETELAH LOGIN
 // ==========================================
 
-// Kalau user sudah login dan akses root, redirect ke dashboard
 Route::get('/home', function () {
-    return redirect()->route('admin.dashboard');
+    if (auth()->user()->isAdmin()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('user.dashboard');
 })->middleware('auth');
