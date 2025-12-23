@@ -56,20 +56,24 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth'])
     ->group(function () {
-        
+
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
-        
+
         // Categories CRUD
         Route::resource('categories', CategoryController::class);
-        
+
         // Products CRUD
         Route::resource('products', ProductController::class);
-        
+
         // Users Management
         Route::resource('users', UserController::class);
-        
+
+        // Di dalam Route::prefix('admin')->group()
+        Route::delete('/products/images/{image}', [ProductController::class, 'deleteImage'])
+            ->name('admin.products.images.delete');
+
         // Additional Routes (nanti bisa ditambahkan)
         // Route::get('/reports', [ReportController::class, 'index'])->name('reports');
         // Route::get('/settings', [SettingController::class, 'index'])->name('settings');
