@@ -4,6 +4,92 @@
 @section('page-title', 'Dashboard')
 
 @push('styles')
+<style>
+    /* Custom Styles untuk Dashboard */
+    .welcome-card {
+        background: linear-gradient(135deg, #8B6F47 0%, #6d5637 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .welcome-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+    
+    .stats-card {
+        border-radius: 15px;
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--card-color);
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    
+    .product-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        object-fit: cover;
+    }
+    
+    .quick-action-btn {
+        border-radius: 12px;
+        padding: 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateX(5px);
+    }
+    
+    .category-item {
+        padding: 1rem;
+        border-radius: 10px;
+        background: #f8f9fa;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .category-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+</style>
+@endpush
 
 @section('content')
 <!-- Welcome Card -->
@@ -39,7 +125,7 @@
 <!-- Stats Cards -->
 <div class="row mb-4">
     <!-- Total Produk -->
-    <div class="col-sm-6 col-lg-3 mb-3">
+    <div class="col-sm-6 col-xl-3 mb-3">
         <div class="card stats-card shadow-sm" style="--card-color: #667eea;">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -59,7 +145,7 @@
     </div>
 
     <!-- Total Kategori -->
-    <div class="col-sm-6 col-lg-3 mb-3">
+    <div class="col-sm-6 col-xl-3 mb-3">
         <div class="card stats-card shadow-sm" style="--card-color: #f093fb;">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -79,7 +165,7 @@
     </div>
 
     <!-- Stok Rendah -->
-    <div class="col-sm-6 col-lg-3 mb-3">
+    <div class="col-sm-6 col-xl-3 mb-3">
         <div class="card stats-card shadow-sm" style="--card-color: #ff6b6b;">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -99,7 +185,7 @@
     </div>
 
     <!-- Total Users -->
-    <div class="col-sm-6 col-lg-3 mb-3">
+    <div class="col-sm-6 col-xl-3 mb-3">
         <div class="card stats-card shadow-sm" style="--card-color: #48dbfb;">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -121,7 +207,7 @@
 
 <div class="row">
     <!-- Produk Terbaru -->
-    <div class="col-lg-8 mb-4">
+    <div class="col-xl-8 mb-4">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
                 <div>
@@ -170,7 +256,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="col-lg-4">
+    <div class="col-xl-4">
         <!-- Quick Actions -->
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white border-0 py-3">
@@ -236,7 +322,6 @@
     // Optional: Auto refresh stats setiap 5 menit
     setInterval(function() {
         console.log('Stats will be refreshed...');
-        // location.reload();
     }, 300000);
 </script>
 @endpush
