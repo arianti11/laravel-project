@@ -5,7 +5,6 @@
 
 @push('styles')
 
-
 @section('content')
 <!-- Welcome Card -->
 <div class="row mb-4">

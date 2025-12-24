@@ -4,16 +4,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kerajinan Tangan UMKM - Handmad</title>
-
-    <!-- Bootstrap CSS -->
+    <title>Kerajinan Tangan UMKM - Handmade with Love</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <style>
+        /* Override container untuk full width */
+        .hero .container,
+        .features .container,
+        .products .container,
+        .cta .container,
+        footer .container {
+            max-width: 100% !important;
+            padding-left: 5%;
+            padding-right: 5%;
+        }
 
-    <!-- Custom CSS -->
-    <link href="assets/css/style.css" rel="stylesheet">
+        /* Navbar juga full width */
+        .navbar .container {
+            max-width: 100% !important;
+            padding-left: 3%;
+            padding-right: 3%;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +34,8 @@
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-hand-sparkles"></i> KraftiQu</a>
+                <i class="fas fa-hand-sparkles"></i> KraftiQu
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -31,10 +45,10 @@
                         <a class="nav-link" href="#beranda">Beranda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#tentang">Tentang</a>
+                        <a class="nav-link" href="#produk">Produk</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#produk">Produk</a>
+                        <a class="nav-link" href="#tentang">Tentang</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#kontak">Kontak</a>
@@ -52,7 +66,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1>Kerajinan Tangan<br>Dibuat dengan <span style="color: var(--primary);">penuh hati</span></h1>
+                    <h1>Kerajinan Tangan<br>Dibuat dengan <span style="color: var(--primary);">❤️ </span></h1>
                     <p>Temukan koleksi kerajinan tangan unik dan berkualitas dari pengrajin lokal Indonesia. Setiap
                         produk dibuat dengan penuh perhatian dan dedikasi.</p>
                     <a href="#produk" class="btn btn-primary-custom me-3">
@@ -120,7 +134,7 @@
                 <p class="text-muted">Koleksi terbaik dari pengrajin kami</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-4">
+                <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card">
                         <div class="product-image d-flex align-items-center justify-content-center">
                             <i class="fas fa-tshirt" style="font-size: 5rem; color: white;"></i>
@@ -130,12 +144,14 @@
                             <p class="text-muted small">Kain batik tulis dengan motif tradisional</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp 350.000</span>
-                                <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card">
                         <div class="product-image d-flex align-items-center justify-content-center">
                             <i class="fas fa-gem" style="font-size: 5rem; color: white;"></i>
@@ -145,12 +161,14 @@
                             <p class="text-muted small">Kalung handmade dengan desain etnik</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp 150.000</span>
-                                <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card">
                         <div class="product-image d-flex align-items-center justify-content-center">
                             <i class="fas fa-paint-brush" style="font-size: 5rem; color: white;"></i>
@@ -160,12 +178,14 @@
                             <p class="text-muted small">Lukisan abstrak dengan cat akrilik</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp 500.000</span>
-                                <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card">
                         <div class="product-image d-flex align-items-center justify-content-center">
                             <i class="fas fa-vase" style="font-size: 5rem; color: white;"></i>
@@ -175,12 +195,14 @@
                             <p class="text-muted small">Vas keramik dengan glasir natural</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp 200.000</span>
-                                <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card">
                         <div class="product-image d-flex align-items-center justify-content-center">
                             <i class="fas fa-shopping-basket" style="font-size: 5rem; color: white;"></i>
@@ -190,12 +212,14 @@
                             <p class="text-muted small">Tas rotan anyaman tangan berkualitas</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp 275.000</span>
-                                <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="product-card">
                         <div class="product-image d-flex align-items-center justify-content-center">
                             <i class="fas fa-couch" style="font-size: 5rem; color: white;"></i>
@@ -205,7 +229,43 @@
                             <p class="text-muted small">Bantal dengan bordir tangan yang indah</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="product-price">Rp 125.000</span>
-                                <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        <div class="product-image d-flex align-items-center justify-content-center">
+                            <i class="fas fa-palette" style="font-size: 5rem; color: white;"></i>
+                        </div>
+                        <div class="product-body">
+                            <h5 class="product-title">Keramik Hias</h5>
+                            <p class="text-muted small">Keramik dengan motif tradisional</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="product-price">Rp 180.000</span>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="product-card">
+                        <div class="product-image d-flex align-items-center justify-content-center">
+                            <i class="fas fa-hat-wizard" style="font-size: 5rem; color: white;"></i>
+                        </div>
+                        <div class="product-body">
+                            <h5 class="product-title">Topi Anyaman</h5>
+                            <p class="text-muted small">Topi pandan untuk pantai</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="product-price">Rp 95.000</span>
+                                <a href="{{ route('register') }}" class="btn btn-light-custom">
+                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -217,10 +277,11 @@
     <!-- CTA -->
     <section class="cta">
         <div class="container">
-            <h2>Siap Memulai Bisnis Kerajinan Anda?</h2>
-            <p class="mb-4">Bergabunglah dengan komunitas pengrajin kami dan mulai jual produk Anda hari ini!</p>
+            <h2>Siap Mulai Berbelanja Kerajinan Yang Anda Sukai?</h2>
+            <p class="mb-4">Bergabunglah dan Jadi Membership di UMKM Kami!</p>
             <a href="{{ route('register') }}" class="btn btn-light-custom">
-                <i class="fas fa-user-plus me-2"></i>Daftar Sekarang</a>
+                <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
+            </a>
         </div>
     </section>
 
@@ -230,7 +291,7 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5 class="mb-3">KraftiQu</h5>
-                    <p class="mb-2">Platform manajemen produk untuk UMKM kerajinan tangan Indonesia.</p>
+                    <p class="list-unstyled">Platform manajemen produk untuk UMKM kerajinan tangan Indonesia.</p>
                     <div class="social-icons mt-3">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
@@ -256,18 +317,15 @@
                     </p>
                 </div>
             </div>
-            <hr style="border-color: rgba(250, 250, 250, 1);">
-            <div class="text-center text-muted">
+            <hr style="border-color: rgba(223, 221, 221, 0.89);">
+            <div class="text-center list-unstyled pb-3">
                 <p class="mb-0">&copy; 2024 KraftiQu. Made with ❤️ in Indonesia</p>
             </div>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Custom JS -->
-    <script src="assets/js/script.js"></script>
+    <script src="{{ asset('assets/js/script.js') }}"></script>
 </body>
 
 </html>

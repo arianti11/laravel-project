@@ -46,47 +46,6 @@
             </a>
         </li>
 
-        <!-- Divider -->
-        <li class="nav-title">Laporan</li>
-
-        <!-- Reports -->
-        <li class="nav-group">
-            <a class="nav-link nav-group-toggle" href="#">
-                <i class="nav-icon fas fa-chart-bar"></i> Laporan
-            </a>
-            <ul class="nav-group-items compact">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="nav-icon fas fa-circle" style="font-size: 0.5rem;"></i> Produk Terlaris
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="nav-icon fas fa-circle" style="font-size: 0.5rem;"></i> Stok Produk
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-        <!-- Divider -->
-        <li class="nav-title">Pengaturan</li>
-
-        <!-- Settings -->
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="nav-icon fas fa-cog"></i> Pengaturan
-            </a>
-        </li>
-
-        <!-- Help -->
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-                <i class="nav-icon fas fa-question-circle"></i> Bantuan
-            </a>
-        </li>
-
-    </ul>
-
     <div class="sidebar-footer border-top d-flex">
         <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable"></button>
     </div>
