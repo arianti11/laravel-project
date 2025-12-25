@@ -24,34 +24,9 @@
 
     @stack('styles')
 
-    <style>
-        .wrapper {
-            margin-left: 256px;
-            transition: margin-left .3s;
-        }
-
-        .body {
-            padding-top: 1rem;
-            background-color: #f5f6f8;
-        }
-
-        .footer{
-            margin-left: 256px;
-            transition: margin-left .3s;
-        }
-        .header {
-            background: #ffffff;
-            height: 64px;
-        }
-    </style>
 </head>
 
 <body>
-
-    <!-- SIDEBAR -->
-    @include('layouts.partials.sidebar')
-
-
     <!-- WRAPPER -->
     <div class="wrapper d-flex flex-column min-vh-100">
 
@@ -60,8 +35,8 @@
 
 
         <!-- MAIN CONTENT -->
-        <!-- <div class="body flex-grow-1 px-3">
-            <div class="container-fluid py-4"> -->
+        <div class="body flex-grow-1 px-3">
+            <div class="container-fluid py-4">
 
         <!-- ALERT SUCCESS -->
         @if(session('success'))

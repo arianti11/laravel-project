@@ -6,7 +6,7 @@
             <i class="fas fa-bars"></i>
         </button>
 
-        <ul class="header-nav d-none d-lg-flex">
+        <!-- <ul class="header-nav d-none d-lg-flex">
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.dashboard') }}">
                     <i class="fas fa-home me-1"></i> Home
@@ -17,7 +17,7 @@
                     <i class="fas fa-globe me-1"></i> Lihat Website
                 </a>
             </li>
-        </ul>
+        </ul> -->
 
         <ul class="header-nav ms-auto">
             <!-- Notifications -->

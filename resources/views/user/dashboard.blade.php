@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.appUser')
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard User')
@@ -29,7 +29,7 @@
 </div>
 
 <!-- Stats -->
-<div class="row mb-4">
+<!-- <div class="row mb-4">
     <div class="col-md-6 mb-3">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body">
@@ -61,10 +61,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Kategori -->
-<div class="row mb-4">
+<!-- <div class="row mb-4">
     <div class="col-12">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white py-3">
@@ -92,7 +92,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Produk Terbaru -->
 <div class="row">
