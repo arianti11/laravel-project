@@ -30,24 +30,24 @@ Route::get('/', function () {
 
 // Login
 Route::get('/login', [LoginController::class, 'showLoginForm'])
-    ->name('login')
-    ->middleware('guest');
+    ->name('login');
+    // ->middleware('guest');
 
-Route::post('/login', [LoginController::class, 'login'])
-    ->middleware('guest');
+Route::post('/login', [LoginController::class, 'login']);
+    // ->middleware('guest');
 
 // Register
 Route::get('/register', [RegisterController::class, 'showRegisterForm'])
-    ->name('register')
-    ->middleware('guest');
+    ->name('register');
+    // ->middleware('guest');
 
-Route::post('/register', [RegisterController::class, 'register'])
-    ->middleware('guest');
+Route::post('/register', [RegisterController::class, 'register']);
+    // ->middleware('guest');
 
 // Logout
 Route::post('/logout', [LoginController::class, 'logout'])
-    ->name('logout')
-    ->middleware('auth');
+    ->name('logout');
+    // ->middleware('auth');
 
 // ==========================================
 // ADMIN ROUTES (Perlu Login + Role Admin)
