@@ -3,10 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
+use App\Http\Controllers\Staff\ProductController as StaffProductController;
 use App\Http\Controllers\User\UserDashboardController;
 
 /*
@@ -28,29 +30,23 @@ Route::get('/', function () {
 // AUTHENTICATION ROUTES
 // ==========================================
 
-// Login
-Route::get('/login', [LoginController::class, 'showLoginForm'])
-    ->name('login');
-    // ->middleware('guest');
+Route::middleware('guest')->group(function () {
+    // Login
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 
-Route::post('/login', [LoginController::class, 'login']);
-    // ->middleware('guest');
-
-// Register
-Route::get('/register', [RegisterController::class, 'showRegisterForm'])
-    ->name('register');
-    // ->middleware('guest');
-
-Route::post('/register', [RegisterController::class, 'register']);
-    // ->middleware('guest');
+    // Register
+    Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+});
 
 // Logout
 Route::post('/logout', [LoginController::class, 'logout'])
-    ->name('logout');
-    // ->middleware('auth');
+    ->name('logout')
+    ->middleware('auth');
 
 // ==========================================
-// ADMIN ROUTES (Perlu Login + Role Admin)
+// ADMIN ROUTES (Super User - Full Access)
 // ==========================================
 
 Route::prefix('admin')
@@ -59,25 +55,74 @@ Route::prefix('admin')
     ->group(function () {
         
         // Dashboard Admin
-        Route::get('/dashboard', [DashboardController::class, 'index'])
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
         
-        // Categories CRUD
+        // Categories CRUD (ADMIN ONLY)
         Route::resource('categories', CategoryController::class);
         
-        // Products CRUD
-        Route::resource('products', ProductController::class);
+        // Products CRUD (ADMIN ONLY - Full Control)
+        Route::resource('products', AdminProductController::class);
         
         // Delete product image
-        Route::delete('/products/images/{image}', [ProductController::class, 'deleteImage'])
+        Route::delete('/products/images/{image}', [AdminProductController::class, 'deleteImage'])
             ->name('products.images.delete');
         
-        // Users Management
+        // Users Management (ADMIN ONLY)
         Route::resource('users', UserController::class);
+        
+        // Activity Logs (ADMIN ONLY)
+        Route::get('/activity-logs', [AdminDashboardController::class, 'activityLogs'])
+            ->name('activity-logs');
+        
+        // Reports (ADMIN ONLY - Full Access)
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/sales', [AdminDashboardController::class, 'salesReport'])->name('sales');
+            Route::get('/products', [AdminDashboardController::class, 'productsReport'])->name('products');
+            Route::get('/users', [AdminDashboardController::class, 'usersReport'])->name('users');
+            Route::get('/activities', [AdminDashboardController::class, 'activitiesReport'])->name('activities');
+        });
+        
+        // Settings (ADMIN ONLY)
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/', [AdminDashboardController::class, 'settings'])->name('index');
+            Route::post('/', [AdminDashboardController::class, 'updateSettings'])->name('update');
+        });
     });
 
 // ==========================================
-// USER ROUTES (Perlu Login, Role User Biasa)
+// STAFF ROUTES (Operator - Limited Access)
+// ==========================================
+
+Route::prefix('staff')
+    ->name('staff.')
+    ->middleware(['auth', 'staff'])
+    ->group(function () {
+        
+        // Dashboard Staff
+        Route::get('/dashboard', [StaffDashboardController::class, 'index'])
+            ->name('dashboard');
+        
+        // Products Management (STAFF - Can Create, Edit, View)
+        Route::resource('products', StaffProductController::class)
+            ->except(['destroy']); // Staff tidak bisa delete
+        
+        // Delete product image (Staff bisa delete image)
+        Route::delete('/products/images/{image}', [StaffProductController::class, 'deleteImage'])
+            ->name('products.images.delete');
+        
+        // Orders Management (Staff bisa manage orders)
+        // Route::resource('orders', OrderController::class); // Nanti dibuat
+        
+        // Reports (STAFF - View Only, Limited)
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/products', [StaffDashboardController::class, 'productsReport'])->name('products');
+            Route::get('/orders', [StaffDashboardController::class, 'ordersReport'])->name('orders');
+        });
+    });
+
+// ==========================================
+// USER ROUTES (Customer)
 // ==========================================
 
 Route::prefix('user')
@@ -95,15 +140,26 @@ Route::prefix('user')
         
         Route::put('/profile', [UserDashboardController::class, 'updateProfile'])
             ->name('profile.update');
+        
+        // Orders (Customer)
+        // Route::get('/orders', [UserDashboardController::class, 'orders'])->name('orders');
+        // Route::get('/orders/{order}', [UserDashboardController::class, 'orderDetail'])->name('orders.show');
     });
 
 // ==========================================
-// REDIRECT SETELAH LOGIN
+// REDIRECT SETELAH LOGIN (Berdasarkan Role)
 // ==========================================
 
 Route::get('/home', function () {
-    if (auth()->user()->isAdmin()) {
+    $user = auth()->user();
+    
+    if ($user->isAdmin()) {
         return redirect()->route('admin.dashboard');
     }
+    
+    if ($user->isStaff()) {
+        return redirect()->route('staff.dashboard');
+    }
+    
     return redirect()->route('user.dashboard');
-})->middleware('auth');
+})->middleware('auth')->name('home.redirect');

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,9 +13,6 @@ class User extends Authenticatable
 
     /**
      * The attributes that are mass assignable.
-     * Kolom yang boleh diisi massal
-     *
-     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -30,9 +26,6 @@ class User extends Authenticatable
 
     /**
      * The attributes that should be hidden for serialization.
-     * Kolom yang disembunyikan saat serialize (response API)
-     *
-     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -41,9 +34,6 @@ class User extends Authenticatable
 
     /**
      * Get the attributes that should be cast.
-     * Casting tipe data
-     *
-     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -54,11 +44,12 @@ class User extends Authenticatable
         ];
     }
 
+    // ============================================
+    // SCOPES
+    // ============================================
+
     /**
      * SCOPE: Hanya user yang aktif
-     * 
-     * Cara pakai:
-     * User::active()->get();
      */
     public function scopeActive($query)
     {
@@ -67,9 +58,6 @@ class User extends Authenticatable
 
     /**
      * SCOPE: Hanya admin
-     * 
-     * Cara pakai:
-     * User::admin()->get();
      */
     public function scopeAdmin($query)
     {
@@ -77,21 +65,31 @@ class User extends Authenticatable
     }
 
     /**
-     * SCOPE: Hanya user biasa (bukan admin)
-     * 
-     * Cara pakai:
-     * User::regularUser()->get();
+     * SCOPE: Hanya staff
      */
-    public function scopeRegularUser($query)
+    public function scopeStaff($query)
+    {
+        return $query->where('role', 'staff');
+    }
+
+    /**
+     * SCOPE: Hanya user biasa (customer)
+     */
+    public function scopeCustomer($query)
     {
         return $query->where('role', 'user');
     }
 
     /**
+     * SCOPE: Admin dan Staff (untuk permission yang sama)
+     */
+    public function scopeAdminOrStaff($query)
+    {
+        return $query->whereIn('role', ['admin', 'staff']);
+    }
+
+    /**
      * SCOPE: Search user berdasarkan nama atau email
-     * 
-     * Cara pakai:
-     * User::search('john')->get();
      */
     public function scopeSearch($query, $keyword)
     {
@@ -102,26 +100,23 @@ class User extends Authenticatable
         });
     }
 
+    // ============================================
+    // ACCESSORS
+    // ============================================
+
     /**
      * ACCESSOR: Mendapatkan URL avatar
-     * 
-     * Cara pakai:
-     * $user->avatar_url
      */
     public function getAvatarUrlAttribute()
     {
         if ($this->avatar) {
             return asset('storage/' . $this->avatar);
         }
-        // Default avatar
         return asset('images/default-avatar.png');
     }
 
     /**
      * ACCESSOR: Mendapatkan inisial nama (2 huruf pertama)
-     * 
-     * Cara pakai:
-     * $user->initials // JD (dari John Doe)
      */
     public function getInitialsAttribute()
     {
@@ -133,10 +128,35 @@ class User extends Authenticatable
     }
 
     /**
-     * METHOD: Cek apakah user adalah admin
-     * 
-     * Cara pakai:
-     * if ($user->isAdmin()) { ... }
+     * ACCESSOR: Role badge color untuk UI
+     */
+    public function getRoleBadgeAttribute()
+    {
+        return [
+            'admin' => 'danger',    // Red
+            'staff' => 'warning',   // Yellow
+            'user' => 'primary',    // Blue
+        ][$this->role] ?? 'secondary';
+    }
+
+    /**
+     * ACCESSOR: Role label untuk display
+     */
+    public function getRoleLabelAttribute()
+    {
+        return [
+            'admin' => 'Administrator',
+            'staff' => 'Staff',
+            'user' => 'Customer',
+        ][$this->role] ?? 'Unknown';
+    }
+
+    // ============================================
+    // METHODS - Role Checking
+    // ============================================
+
+    /**
+     * Cek apakah user adalah admin
      */
     public function isAdmin()
     {
@@ -144,21 +164,76 @@ class User extends Authenticatable
     }
 
     /**
-     * METHOD: Cek apakah user adalah user biasa
-     * 
-     * Cara pakai:
-     * if ($user->isUser()) { ... }
+     * Cek apakah user adalah staff
      */
-    public function isUser()
+    public function isStaff()
+    {
+        return $this->role === 'staff';
+    }
+
+    /**
+     * Cek apakah user adalah customer biasa
+     */
+    public function isCustomer()
     {
         return $this->role === 'user';
     }
 
     /**
-     * METHOD: Aktivasi user
+     * Cek apakah user adalah admin atau staff
+     * (untuk permission yang sama antara admin & staff)
+     */
+    public function isAdminOrStaff()
+    {
+        return in_array($this->role, ['admin', 'staff']);
+    }
+
+    /**
+     * Cek apakah user punya permission tertentu
      * 
-     * Cara pakai:
-     * $user->activate();
+     * @param string $permission (create, edit, delete, view)
+     * @param string $module (users, categories, products, orders, reports, settings)
+     * @return bool
+     */
+    public function can($permission, $module = null)
+    {
+        // Admin bisa semua
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Staff permissions (customize sesuai kebutuhan)
+        if ($this->isStaff()) {
+            // Staff TIDAK BISA manage users, categories, settings
+            $restrictedModules = ['users', 'categories', 'settings'];
+            
+            if (in_array($module, $restrictedModules)) {
+                return false;
+            }
+
+            // Staff bisa manage products & orders
+            if (in_array($module, ['products', 'orders'])) {
+                return in_array($permission, ['create', 'edit', 'view']);
+            }
+
+            // Staff bisa view reports (tidak edit/delete)
+            if ($module === 'reports') {
+                return $permission === 'view';
+            }
+
+            return false;
+        }
+
+        // Customer default permission
+        return false;
+    }
+
+    // ============================================
+    // METHODS - User Management
+    // ============================================
+
+    /**
+     * Aktivasi user
      */
     public function activate()
     {
@@ -166,13 +241,18 @@ class User extends Authenticatable
     }
 
     /**
-     * METHOD: Nonaktifkan user
-     * 
-     * Cara pakai:
-     * $user->deactivate();
+     * Nonaktifkan user
      */
     public function deactivate()
     {
         $this->update(['is_active' => false]);
+    }
+
+    /**
+     * Toggle status aktif
+     */
+    public function toggleStatus()
+    {
+        $this->update(['is_active' => !$this->is_active]);
     }
 }

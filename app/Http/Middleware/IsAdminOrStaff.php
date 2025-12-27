@@ -6,13 +6,16 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsAdmin
+class IsAdminOrStaff
 {
     /**
      * Handle an incoming request.
      *
-     * Middleware ini memastikan hanya user dengan role 'admin'
+     * Middleware ini memastikan hanya user dengan role 'admin' atau 'staff'
      * yang bisa mengakses route yang dilindungi
+     *
+     * Cocok untuk route yang bisa diakses admin & staff
+     * (misalnya: view products, view orders, dll)
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
@@ -20,15 +23,13 @@ class IsAdmin
     {
         // Cek apakah user sudah login
         if (!auth()->check()) {
-            // Redirect ke login jika belum login
             return redirect()->route('login')
                            ->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Cek apakah user adalah admin
-        if (!auth()->user()->isAdmin()) {
-            // Jika bukan admin, abort dengan error 403 (Forbidden)
-            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
+        // Cek apakah user adalah admin atau staff
+        if (!auth()->user()->isAdminOrStaff()) {
+            abort(403, 'Akses ditolak. Halaman ini hanya untuk Admin dan Staff.');
         }
 
         // Jika lolos semua pengecekan, lanjutkan request
