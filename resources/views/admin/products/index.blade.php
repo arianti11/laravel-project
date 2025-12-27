@@ -1,235 +1,249 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Produk')
-@section('page-title', 'Manajemen Produk')
+@section('title', 'Kelola Produk')
 
 @section('content')
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                <div>
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-box text-primary me-2"></i>Daftar Produk
-                    </h5>
-                    <small class="text-muted">Kelola produk kerajinan tangan</small>
-                </div>
-                <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Tambah Produk
-                </a>
-            </div>
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Kelola Produk</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Produk</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Tambah Produk
+        </a>
+    </div>
 
-            <div class="card-body">
-                <!-- Filter & Search -->
-                <form method="GET" action="{{ route('admin.products.index') }}" class="mb-4">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                                <input type="text" 
-                                       name="search" 
-                                       class="form-control" 
-                                       placeholder="Cari produk..." 
-                                       value="{{ request('search') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="category" class="form-select">
-                                <option value="">Semua Kategori</option>
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="status" class="form-select">
-                                <option value="">Semua Status</option>
-                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Ready</option>
-                                <option value="preorder" {{ request('status') == 'preorder' ? 'selected' : '' }}>Pre-Order</option>
-                                <option value="sold_out" {{ request('status') == 'sold_out' ? 'selected' : '' }}>Sold Out</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="stock" class="form-select">
-                                <option value="">Semua Stok</option>
-                                <option value="low" {{ request('stock') == 'low' ? 'selected' : '' }}>Stok Rendah</option>
-                                <option value="out" {{ request('stock') == 'out' ? 'selected' : '' }}>Habis</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary flex-fill">
-                                    <i class="fas fa-filter me-1"></i>Filter
-                                </button>
-                                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-redo"></i>
-                                </a>
-                            </div>
+    <!-- Filters & Search -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('admin.products.index') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="Cari produk..." 
+                               value="{{ request('search') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category" class="form-select">
+                            <option value="">Semua Kategori</option>
+                            @foreach($categories ?? [] as $category)
+                            <option value="{{ $category->id }}" 
+                                    {{ request('category') == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="status" class="form-select">
+                            <option value="">Semua Status</option>
+                            <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Ready</option>
+                            <option value="preorder" {{ request('status') == 'preorder' ? 'selected' : '' }}>Preorder</option>
+                            <option value="sold_out" {{ request('status') == 'sold_out' ? 'selected' : '' }}>Sold Out</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="btn-group w-100">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Cari
+                            </button>
+                            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> Reset
+                            </a>
                         </div>
                     </div>
-                </form>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th width="5%">No</th>
-                                <th width="30%">Produk</th>
-                                <th width="15%">Kategori</th>
-                                <th width="15%">Harga</th>
-                                <th width="10%" class="text-center">Stok</th>
-                                <th width="10%" class="text-center">Status</th>
-                                <th width="15%" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($products as $product)
-                            <tr>
-                                <td>{{ $loop->iteration + ($products->currentPage() - 1) * $products->perPage() }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <img src="{{ $product->image_url }}" 
-                                             alt="{{ $product->name }}"
-                                             class="rounded me-3"
-                                             style="width: 60px; height: 60px; object-fit: cover;">
-                                        <div>
-                                            <h6 class="mb-0">{{ Str::limit($product->name, 40) }}</h6>
-                                            <small class="text-muted">{{ $product->code }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-light text-dark border">
-                                        <i class="fas fa-folder me-1"></i>{{ $product->category->name }}
-                                    </span>
-                                </td>
-                                <td>
+    <!-- Products Table -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Daftar Produk 
+                <span class="badge bg-primary">{{ $products->total() ?? 0 }}</span>
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 35%">Produk</th>
+                            <th style="width: 15%">Kategori</th>
+                            <th style="width: 12%">Harga</th>
+                            <th style="width: 8%">Stok</th>
+                            <th style="width: 10%">Status</th>
+                            <th style="width: 15%" class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($products ?? [] as $index => $product)
+                        <tr>
+                            <td>{{ $products->firstItem() + $index }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ $product->image_url }}" 
+                                         alt="{{ $product->name }}" 
+                                         class="rounded me-3"
+                                         style="width: 50px; height: 50px; object-fit: cover;">
                                     <div>
-                                        <strong class="text-primary">{{ $product->formatted_price }}</strong>
-                                        @if($product->discount_price)
-                                            <br>
-                                            <small class="text-decoration-line-through text-muted">
-                                                {{ $product->formatted_discount_price }}
-                                            </small>
-                                            <span class="badge bg-danger ms-1">-{{ $product->discount_percentage }}%</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge {{ $product->stock < 10 ? 'bg-danger' : 'bg-success' }} rounded-pill">
-                                        {{ $product->stock }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-{{ $product->status_badge }}">
-                                        {{ ucfirst($product->status) }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.products.show', $product->id) }}" 
-                                           class="btn btn-outline-info"
-                                           data-bs-toggle="tooltip" 
-                                           title="Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.products.edit', $product->id) }}" 
-                                           class="btn btn-outline-warning"
-                                           data-bs-toggle="tooltip" 
-                                           title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button" 
-                                                class="btn btn-outline-danger"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#deleteModal{{ $product->id }}"
-                                                title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteModal{{ $product->id }}" tabindex="-1">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header border-0">
-                                            <h5 class="modal-title">
-                                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                                                Konfirmasi Hapus
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Apakah Anda yakin ingin menghapus produk:</p>
-                                            <div class="alert alert-light">
-                                                <strong>{{ $product->name }}</strong><br>
-                                                <small class="text-muted">{{ $product->code }}</small>
-                                            </div>
-                                            <p class="text-danger small mb-0">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                Data yang dihapus tidak dapat dikembalikan!
-                                            </p>
-                                        </div>
-                                        <div class="modal-footer border-0">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                Batal
-                                            </button>
-                                            <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">
-                                                    <i class="fas fa-trash me-1"></i>Hapus Produk
-                                                </button>
-                                            </form>
-                                        </div>
+                                        <div class="fw-bold">{{ $product->name }}</div>
+                                        <small class="text-muted">
+                                            <span class="badge bg-light text-dark">{{ $product->code }}</span>
+                                        </small>
                                     </div>
                                 </div>
-                            </div>
-                            @empty
-                            <tr>
-                                <td colspan="7" class="text-center py-5">
-                                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                                    <h6 class="text-muted">Belum ada produk</h6>
-                                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary mt-2">
-                                        <i class="fas fa-plus me-2"></i>Tambah Produk Pertama
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-tag me-1"></i>
+                                    {{ $product->category->name }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-success">{{ $product->formatted_price }}</div>
+                                @if($product->discount_price)
+                                <small class="text-muted text-decoration-line-through">
+                                    {{ $product->formatted_discount_price }}
+                                </small>
+                                <span class="badge bg-danger ms-1">
+                                    -{{ $product->discount_percentage }}%
+                                </span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($product->stock > 10)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        {{ $product->stock }}
+                                    </span>
+                                @elseif($product->stock > 0)
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        {{ $product->stock }}
+                                    </span>
+                                @else
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        Habis
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $product->status_badge }}">
+                                    {{ ucfirst($product->status) }}
+                                </span>
+                                @if($product->is_published)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-eye-slash"></i>
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('admin.products.show', $product) }}" 
+                                       class="btn btn-info"
+                                       title="Detail">
+                                        <i class="fas fa-eye"></i>
                                     </a>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                                    <a href="{{ route('admin.products.edit', $product) }}" 
+                                       class="btn btn-warning"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-danger"
+                                            onclick="deleteProduct({{ $product->id }})"
+                                            title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
 
-                <!-- Pagination -->
-                @if($products->hasPages())
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="text-muted">
-                        Menampilkan {{ $products->firstItem() }} - {{ $products->lastItem() }} dari {{ $products->total() }} produk
-                    </div>
-                    <div>
-                        {{ $products->links() }}
-                    </div>
-                </div>
-                @endif
+                                <form id="delete-form-{{ $product->id }}" 
+                                      action="{{ route('admin.products.destroy', $product) }}" 
+                                      method="POST" 
+                                      style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-box-open fa-3x mb-3"></i>
+                                    <p class="mb-0">Belum ada produk</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
+
+            <!-- Pagination -->
+            @if(isset($products) && $products->hasPages())
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Menampilkan {{ $products->firstItem() }} - {{ $products->lastItem() }} 
+                    dari {{ $products->total() }} produk
+                </div>
+                <div>
+                    {{ $products->links() }}
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Tooltip
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+function deleteProduct(id) {
+    Swal.fire({
+        title: 'Hapus Produk?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+
+// Show success message if exists
+@if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session('success') }}',
+        timer: 3000,
+        showConfirmButton: false
+    });
+@endif
 </script>
 @endpush
+@endsection

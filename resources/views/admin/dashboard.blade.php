@@ -1,54 +1,102 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Dashboard')
-@section('page-title', 'Dashboard')
+@section('title', 'Dashboard Admin')
 
 @section('content')
-<!-- Welcome Card -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="welcome-card text-white p-4 position-relative">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <h3 class="fw-bold mb-2">
-                        <i class="fas fa-hand-sparkles me-2"></i>
-                        Selamat Datang, {{ auth()->user()->name }}!
-                    </h3>
-                    <p class="mb-3 opacity-90">
-                        Kelola produk kerajinan tangan Anda dengan mudah dan efisien
-                    </p>
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('admin.products.create') }}" class="btn btn-light">
-                            <i class="fas fa-plus me-2"></i>Tambah Produk
-                        </a>
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-light">
-                            <i class="fas fa-list me-2"></i>Lihat Semua
-                        </a>
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Dashboard Admin</h1>
+            <p class="text-muted mb-0">Selamat datang, {{ auth()->user()->name }}!</p>
+        </div>
+        <div>
+            <span class="badge bg-danger px-3 py-2">
+                <i class="fas fa-crown me-1"></i> Administrator
+            </span>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Products -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Produk
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $totalProducts ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-4 d-none d-lg-block text-end">
-                    <i class="fas fa-chart-line" style="font-size: 8rem; opacity: 0.2;"></i>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Stats Cards -->
-<div class="row mb-4">
-    <!-- Total Produk -->
-    <div class="col-sm-6 col-xl-3 mb-3">
-        <div class="card stats-card shadow-sm" style="--card-color: #667eea;">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stats-icon flex-shrink-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <i class="fas fa-box"></i>
+        <!-- Total Categories -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Kategori
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $totalCategories ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                        </div>
                     </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="text-muted text-uppercase small fw-semibold mb-1">Total Produk</div>
-                        <div class="h3 fw-bold mb-0">{{ $totalProducts ?? 0 }}</div>
-                        <div class="text-success small mt-1">
-                            <i class="fas fa-arrow-up"></i> 12% dari bulan lalu
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Users -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total User
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $totalUsers ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Staff -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Staff
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ $totalStaff ?? 0 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -56,184 +104,140 @@
         </div>
     </div>
 
-    <!-- Total Kategori -->
-    <div class="col-sm-6 col-xl-3 mb-3">
-        <div class="card stats-card shadow-sm" style="--card-color: #f093fb;">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stats-icon flex-shrink-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <i class="fas fa-folder"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="text-muted text-uppercase small fw-semibold mb-1">Kategori</div>
-                        <div class="h3 fw-bold mb-0">{{ $totalCategories ?? 0 }}</div>
-                        <div class="text-info small mt-1">
-                            <i class="fas fa-minus"></i> Tidak ada perubahan
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stok Rendah -->
-    <div class="col-sm-6 col-xl-3 mb-3">
-        <div class="card stats-card shadow-sm" style="--card-color: #ff6b6b;">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stats-icon flex-shrink-0" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="text-muted text-uppercase small fw-semibold mb-1">Stok Rendah</div>
-                        <div class="h3 fw-bold mb-0">{{ $lowStockProducts ?? 0 }}</div>
-                        <div class="text-warning small mt-1">
-                            <i class="fas fa-exclamation"></i> Perlu perhatian
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Users -->
-    <div class="col-sm-6 col-xl-3 mb-3">
-        <div class="card stats-card shadow-sm" style="--card-color: #48dbfb;">
-            <div class="card-body">
-                <div class="d-flex align-items-center">
-                    <div class="stats-icon flex-shrink-0" style="background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%);">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="flex-grow-1 ms-3">
-                        <div class="text-muted text-uppercase small fw-semibold mb-1">Pengguna</div>
-                        <div class="h3 fw-bold mb-0">{{ $totalUsers ?? 0 }}</div>
-                        <div class="text-success small mt-1">
-                            <i class="fas fa-arrow-up"></i> 5% dari bulan lalu
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <!-- Produk Terbaru -->
-    <div class="col-xl-8 mb-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center py-3">
-                <div>
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-box text-primary me-2"></i>Produk Terbaru
-                    </h5>
-                    <small class="text-muted">Produk yang baru ditambahkan</small>
-                </div>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-outline-primary">
-                    Lihat Semua <i class="fas fa-arrow-right ms-1"></i>
-                </a>
-            </div>
-            <div class="card-body p-0">
-                @forelse($latestProducts ?? [] as $product)
-                <div class="d-flex align-items-center p-3 border-bottom">
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="product-img me-3">
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1 fw-semibold">{{ $product->name }}</h6>
-                        <div class="d-flex align-items-center gap-3">
-                            <small class="text-muted">
-                                <i class="fas fa-tag me-1"></i>{{ $product->category->name }}
-                            </small>
-                            <small class="text-muted">
-                                <i class="fas fa-barcode me-1"></i>{{ $product->code }}
-                            </small>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-bold text-primary mb-1">{{ $product->formatted_price }}</div>
-                        <span class="badge {{ $product->stock < 10 ? 'bg-danger' : 'bg-success' }}">
-                            <i class="fas fa-cubes me-1"></i>Stok: {{ $product->stock }}
-                        </span>
-                    </div>
-                </div>
-                @empty
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                    <h6 class="text-muted mb-3">Belum ada produk</h6>
-                    <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Tambah Produk Pertama
+    <!-- Recent Activity & Quick Actions -->
+    <div class="row g-3">
+        <!-- Recent Products -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Produk Terbaru</h6>
+                    <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-primary">
+                        Lihat Semua
                     </a>
                 </div>
-                @endforelse
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Kategori</th>
+                                    <th>Harga</th>
+                                    <th>Stok</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($recentProducts ?? [] as $product)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ $product->image_url }}" 
+                                                 alt="{{ $product->name }}" 
+                                                 class="rounded me-2"
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold">{{ $product->name }}</div>
+                                                <small class="text-muted">{{ $product->code }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ $product->category->name }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $product->formatted_price }}</td>
+                                    <td>
+                                        <span class="badge {{ $product->stock > 10 ? 'bg-success' : 'bg-warning' }}">
+                                            {{ $product->stock }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ $product->status_badge }}">
+                                            {{ ucfirst($product->status) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        Belum ada produk
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sidebar -->
-    <div class="col-xl-4">
         <!-- Quick Actions -->
-        <div class="card shadow-sm border-0 mb-4">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
-                </h5>
-            </div>
-            <div class="card-body">
-                <a href="{{ route('admin.products.create') }}" class="btn btn-primary quick-action-btn w-100 mb-2">
-                    <i class="fas fa-plus me-2"></i>Tambah Produk Baru
-                </a>
-                <a href="{{ route('admin.categories.create') }}" class="btn btn-outline-primary quick-action-btn w-100 mb-2">
-                    <i class="fas fa-folder-plus me-2"></i>Tambah Kategori
-                </a>
-                <a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary quick-action-btn w-100">
-                    <i class="fas fa-list me-2"></i>Lihat Semua Produk
-                </a>
-            </div>
-        </div>
-
-        <!-- Kategori Populer -->
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white border-0 py-3">
-                <h5 class="mb-0 fw-bold">
-                    <i class="fas fa-star text-warning me-2"></i>Kategori Populer
-                </h5>
-            </div>
-            <div class="card-body">
-                @forelse($popularCategories ?? [] as $category)
-                <div class="category-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3">
-                                <i class="fas fa-folder text-primary fa-lg"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">{{ $category->name }}</h6>
-                                <small class="text-muted">{{ $category->products_count }} produk</small>
-                            </div>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">
-                            {{ $category->products_count }}
-                        </span>
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i> Tambah Produk
+                        </a>
+                        <a href="{{ route('admin.categories.create') }}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i> Tambah Kategori
+                        </a>
+                        <a href="{{ route('admin.users.create') }}" class="btn btn-info">
+                            <i class="fas fa-user-plus me-2"></i> Tambah User
+                        </a>
+                        <a href="{{ route('admin.activity-logs') }}" class="btn btn-warning">
+                            <i class="fas fa-history me-2"></i> Activity Logs
+                        </a>
+                        <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </a>
                     </div>
                 </div>
-                @empty
-                <div class="text-center py-4">
-                    <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
-                    <p class="text-muted mb-2">Belum ada kategori</p>
-                    <a href="{{ route('admin.categories.create') }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus me-1"></i>Tambah Kategori
-                    </a>
+            </div>
+
+            <!-- System Info -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">System Info</h6>
                 </div>
-                @endforelse
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <small class="text-muted">Laravel Version:</small>
+                            <div class="fw-bold">{{ app()->version() }}</div>
+                        </li>
+                        <li class="mb-2">
+                            <small class="text-muted">PHP Version:</small>
+                            <div class="fw-bold">{{ phpversion() }}</div>
+                        </li>
+                        <li>
+                            <small class="text-muted">Last Login:</small>
+                            <div class="fw-bold">{{ now()->format('d M Y, H:i') }}</div>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
-<script>
-    // Optional: Auto refresh stats setiap 5 menit
-    setInterval(function() {
-        console.log('Stats will be refreshed...');
-    }, 300000);
-</script>
-@endpush
+<style>
+.border-left-primary {
+    border-left: 4px solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 4px solid #1cc88a !important;
+}
+.border-left-info {
+    border-left: 4px solid #36b9cc !important;
+}
+.border-left-warning {
+    border-left: 4px solid #f6c23e !important;
+}
+</style>
+@endsection

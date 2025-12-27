@@ -160,6 +160,18 @@ class DatabaseSeeder extends Seeder
         // 5. INFO OUTPUT
         // ============================================
         $this->command->info('');
+        // ============================================
+        // 6. SEED PRODUCTS (OPTIONAL)
+        // ============================================
+        $this->command->info('');
+        if ($this->command->confirm('Apakah Anda ingin membuat produk sample?', true)) {
+            $this->call(ProductSeeder::class);
+        }
+
+        // ============================================
+        // 7. INFO OUTPUT
+        // ============================================
+        $this->command->info('');
         $this->command->info('═══════════════════════════════════════════════');
         $this->command->info('🎉 Seeder berhasil dijalankan!');
         $this->command->info('═══════════════════════════════════════════════');

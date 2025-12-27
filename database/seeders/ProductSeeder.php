@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\Category;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
@@ -14,7 +14,9 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ambil kategori yang sudah ada
+        $this->command->info('🎨 Memulai seeding products...');
+
+        // Ambil semua kategori
         $categories = Category::all();
 
         if ($categories->isEmpty()) {
@@ -22,217 +24,254 @@ class ProductSeeder extends Seeder
             return;
         }
 
-        // Data produk sample
-        $products = [
+        // Data produk sample untuk setiap kategori
+        $productsData = [
+            // Kerajinan Kayu
+            [
+                'name' => 'Meja Kayu Jati Minimalis',
+                'category' => 'kerajinan-kayu',
+                'price' => 1500000,
+                'discount_price' => 1350000,
+                'stock' => 15,
+                'weight' => 25000,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Kursi Kayu Mahoni Set',
+                'category' => 'kerajinan-kayu',
+                'price' => 2500000,
+                'stock' => 8,
+                'weight' => 30000,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Lemari Kayu Ukiran Klasik',
+                'category' => 'kerajinan-kayu',
+                'price' => 5000000,
+                'discount_price' => 4500000,
+                'stock' => 3,
+                'weight' => 50000,
+                'status' => 'preorder',
+            ],
+
             // Batik & Tenun
             [
-                'category_id' => 1,
-                'name' => 'Batik Tulis Premium Motif Parang',
-                'short_description' => 'Kain batik tulis premium dengan motif parang klasik',
-                'description' => 'Kain batik tulis premium dengan motif parang klasik yang dibuat dengan teknik tradisional. Menggunakan pewarna alami dan kain berkualitas tinggi.',
-                'price' => 450000,
-                'discount_price' => 400000,
-                'stock' => 15,
+                'name' => 'Batik Tulis Solo Premium',
+                'category' => 'batik-tenun',
+                'price' => 350000,
+                'discount_price' => 315000,
+                'stock' => 25,
                 'weight' => 500,
                 'status' => 'ready',
             ],
             [
-                'category_id' => 1,
                 'name' => 'Kain Tenun Ikat NTT',
-                'short_description' => 'Tenun ikat tradisional dari Nusa Tenggara Timur',
-                'description' => 'Kain tenun ikat asli NTT dengan motif tradisional yang kaya akan makna budaya. Dibuat oleh pengrajin lokal dengan teknik turun temurun.',
-                'price' => 350000,
-                'discount_price' => null,
-                'stock' => 8,
-                'weight' => 400,
-                'status' => 'ready',
-            ],
-
-            // Keramik & Gerabah
-            [
-                'category_id' => 2,
-                'name' => 'Vas Keramik Glasir Alami',
-                'short_description' => 'Vas keramik dengan glasir natural dan desain minimalis',
-                'description' => 'Vas keramik dengan finishing glasir alami yang memberikan tampilan elegan dan natural. Cocok untuk dekorasi ruang tamu atau kamar.',
-                'price' => 175000,
-                'discount_price' => 150000,
-                'stock' => 25,
-                'weight' => 1500,
-                'status' => 'ready',
-            ],
-            [
-                'category_id' => 2,
-                'name' => 'Set Piring Keramik 6 Pcs',
-                'short_description' => 'Set piring keramik handmade untuk sajian spesial',
-                'description' => 'Set 6 piring keramik dengan desain unik dan warna-warna natural. Aman untuk makanan dan microwave.',
-                'price' => 280000,
-                'discount_price' => null,
+                'category' => 'batik-tenun',
+                'price' => 450000,
                 'stock' => 12,
-                'weight' => 3000,
-                'status' => 'ready',
-            ],
-
-            // Anyaman
-            [
-                'category_id' => 3,
-                'name' => 'Tas Rotan Anyaman Premium',
-                'short_description' => 'Tas rotan anyaman tangan dengan desain modern',
-                'description' => 'Tas rotan anyaman 100% handmade dengan desain modern dan finishing halus. Dilengkapi dengan tali kulit asli.',
-                'price' => 320000,
-                'discount_price' => 280000,
-                'stock' => 10,
-                'weight' => 800,
-                'status' => 'ready',
-            ],
-            [
-                'category_id' => 3,
-                'name' => 'Keranjang Pandan Wangi',
-                'short_description' => 'Keranjang anyaman pandan untuk penyimpanan',
-                'description' => 'Keranjang anyaman dari pandan wangi dengan ukuran sedang. Cocok untuk menyimpan pakaian, mainan, atau barang-barang rumah.',
-                'price' => 125000,
-                'discount_price' => null,
-                'stock' => 20,
                 'weight' => 600,
                 'status' => 'ready',
             ],
-
-            // Ukiran Kayu
             [
-                'category_id' => 4,
-                'name' => 'Patung Ukiran Jepara',
-                'short_description' => 'Patung kayu jati ukiran Jepara',
-                'description' => 'Patung ukiran dari kayu jati dengan detail yang sangat halus. Dibuat oleh pengrajin berpengalaman dari Jepara.',
-                'price' => 850000,
-                'discount_price' => null,
-                'stock' => 5,
-                'weight' => 2000,
-                'status' => 'ready',
-            ],
-            [
-                'category_id' => 4,
-                'name' => 'Hiasan Dinding Relief Wayang',
-                'short_description' => 'Relief wayang dari kayu mahoni',
-                'description' => 'Hiasan dinding berupa relief wayang dengan detail ukiran yang indah. Terbuat dari kayu mahoni pilihan.',
-                'price' => 450000,
-                'discount_price' => 420000,
-                'stock' => 7,
-                'weight' => 1500,
-                'status' => 'ready',
-            ],
-
-            // Perhiasan
-            [
-                'category_id' => 5,
-                'name' => 'Kalung Perak Motif Etnik',
-                'short_description' => 'Kalung perak 925 dengan motif etnik Indonesia',
-                'description' => 'Kalung dari perak 925 dengan desain motif etnik tradisional Indonesia. Dikerjakan dengan teknik handmade oleh pengrajin berpengalaman.',
-                'price' => 380000,
-                'discount_price' => 350000,
-                'stock' => 15,
-                'weight' => 50,
-                'status' => 'ready',
-            ],
-            [
-                'category_id' => 5,
-                'name' => 'Gelang Manik-manik Natural',
-                'short_description' => 'Gelang dari manik-manik batu natural',
-                'description' => 'Gelang cantik dari manik-manik batu natural dengan kombinasi warna yang menarik. Cocok untuk gaya casual maupun formal.',
-                'price' => 150000,
-                'discount_price' => null,
+                'name' => 'Batik Cap Pekalongan',
+                'category' => 'batik-tenun',
+                'price' => 250000,
                 'stock' => 30,
-                'weight' => 30,
-                'status' => 'ready',
-            ],
-
-            // Tekstil & Bordir
-            [
-                'category_id' => 6,
-                'name' => 'Bantal Bordir Tangan Bunga',
-                'short_description' => 'Bantal dengan bordir tangan motif bunga',
-                'description' => 'Sarung bantal dengan bordir tangan motif bunga yang cantik dan detail. Bahan katun premium yang lembut dan nyaman.',
-                'price' => 185000,
-                'discount_price' => 165000,
-                'stock' => 18,
-                'weight' => 300,
-                'status' => 'ready',
-            ],
-            [
-                'category_id' => 6,
-                'name' => 'Taplak Meja Sulam',
-                'short_description' => 'Taplak meja dengan sulaman tradisional',
-                'description' => 'Taplak meja dengan sulaman tradisional yang elegan. Cocok untuk acara spesial atau penggunaan sehari-hari.',
-                'price' => 220000,
-                'discount_price' => null,
-                'stock' => 12,
                 'weight' => 400,
                 'status' => 'ready',
             ],
-
-            // Lukisan & Seni
             [
-                'category_id' => 7,
-                'name' => 'Lukisan Abstrak Akrilik',
-                'short_description' => 'Lukisan abstrak di kanvas dengan cat akrilik',
-                'description' => 'Lukisan abstrak original dengan cat akrilik di kanvas. Cocok untuk dekorasi ruang tamu, kamar, atau kantor modern.',
-                'price' => 650000,
-                'discount_price' => 600000,
-                'stock' => 6,
-                'weight' => 2000,
-                'status' => 'ready',
-            ],
-            [
-                'category_id' => 7,
-                'name' => 'Lukisan Pemandangan Bali',
-                'short_description' => 'Lukisan pemandangan sawah terasering Bali',
-                'description' => 'Lukisan pemandangan sawah terasering khas Bali dengan teknik cat minyak. Warna yang hidup dan detail yang indah.',
-                'price' => 550000,
-                'discount_price' => null,
-                'stock' => 4,
-                'weight' => 1800,
+                'name' => 'Sarung Tenun Troso',
+                'category' => 'batik-tenun',
+                'price' => 180000,
+                'stock' => 5,
+                'weight' => 350,
                 'status' => 'ready',
             ],
 
-            // Aksesori Fashion
+            // Makanan & Minuman
             [
-                'category_id' => 8,
-                'name' => 'Syal Tenun Songket',
-                'short_description' => 'Syal dari tenun songket dengan motif tradisional',
-                'description' => 'Syal cantik dari tenun songket dengan motif tradisional yang elegan. Cocok untuk melengkapi outfit formal maupun casual.',
-                'price' => 280000,
-                'discount_price' => 250000,
-                'stock' => 14,
+                'name' => 'Keripik Singkong Balado',
+                'category' => 'makanan-minuman',
+                'price' => 35000,
+                'discount_price' => 30000,
+                'stock' => 100,
+                'weight' => 250,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Kopi Arabica Gayo Premium',
+                'category' => 'makanan-minuman',
+                'price' => 85000,
+                'stock' => 50,
                 'weight' => 200,
                 'status' => 'ready',
             ],
             [
-                'category_id' => 8,
-                'name' => 'Topi Pandan Pantai',
-                'short_description' => 'Topi anyaman pandan untuk pantai',
-                'description' => 'Topi stylish dari anyaman pandan yang cocok untuk ke pantai atau aktivitas outdoor. Ringan dan nyaman dipakai.',
-                'price' => 95000,
-                'discount_price' => null,
-                'stock' => 25,
-                'weight' => 150,
+                'name' => 'Dodol Garut Original',
+                'category' => 'makanan-minuman',
+                'price' => 45000,
+                'stock' => 75,
+                'weight' => 500,
                 'status' => 'ready',
+            ],
+            [
+                'name' => 'Teh Hijau Organik',
+                'category' => 'makanan-minuman',
+                'price' => 55000,
+                'stock' => 8,
+                'weight' => 100,
+                'status' => 'ready',
+            ],
+
+            // Aksesoris
+            [
+                'name' => 'Gelang Perak Handmade',
+                'category' => 'aksesoris',
+                'price' => 125000,
+                'discount_price' => 100000,
+                'stock' => 20,
+                'weight' => 50,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Kalung Mutiara Air Tawar',
+                'category' => 'aksesoris',
+                'price' => 350000,
+                'stock' => 10,
+                'weight' => 30,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Cincin Perak Motif Ukir',
+                'category' => 'aksesoris',
+                'price' => 95000,
+                'stock' => 15,
+                'weight' => 20,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Anting Etnik Cantik',
+                'category' => 'aksesoris',
+                'price' => 65000,
+                'stock' => 0,
+                'weight' => 10,
+                'status' => 'sold_out',
+            ],
+
+            // Fashion
+            [
+                'name' => 'Kemeja Batik Pria Modern',
+                'category' => 'fashion',
+                'price' => 250000,
+                'discount_price' => 225000,
+                'stock' => 25,
+                'weight' => 300,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Dress Batik Wanita Elegan',
+                'category' => 'fashion',
+                'price' => 350000,
+                'stock' => 18,
+                'weight' => 400,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Tas Tenun Etnik',
+                'category' => 'fashion',
+                'price' => 180000,
+                'stock' => 12,
+                'weight' => 500,
+                'status' => 'ready',
+            ],
+            [
+                'name' => 'Sepatu Kulit Asli Handmade',
+                'category' => 'fashion',
+                'price' => 450000,
+                'stock' => 6,
+                'weight' => 800,
+                'status' => 'preorder',
             ],
         ];
 
-        // Insert produk ke database
-        $productCount = 0;
-        foreach ($products as $productData) {
-            // Generate kode produk otomatis
-            $productData['code'] = 'PRD' . str_pad($productCount + 1, 5, '0', STR_PAD_LEFT);
+        $createdCount = 0;
+        $skippedCount = 0;
+
+        foreach ($productsData as $productData) {
+            // Cari kategori berdasarkan slug
+            $category = $categories->where('slug', $productData['category'])->first();
             
-            // Generate slug dari nama
-            $productData['slug'] = Str::slug($productData['name']);
-            
-            // Cek apakah kategori ada
-            if ($productData['category_id'] <= $categories->count()) {
-                Product::create($productData);
-                $productCount++;
+            if (!$category) {
+                $this->command->warn("⚠️  Kategori '{$productData['category']}' tidak ditemukan, skip produk: {$productData['name']}");
+                $skippedCount++;
+                continue;
             }
+
+            // Generate slug
+            $slug = Str::slug($productData['name']);
+
+            // Cek apakah produk dengan slug ini sudah ada
+            $existingProduct = Product::where('slug', $slug)->first();
+            
+            if ($existingProduct) {
+                $this->command->warn("⚠️  Produk '{$productData['name']}' sudah ada, skip...");
+                $skippedCount++;
+                continue;
+            }
+
+            // Buat short description
+            $shortDescription = "Produk {$productData['name']} berkualitas tinggi dengan harga terjangkau.";
+
+            // Buat description lengkap
+            $description = "
+                <p><strong>{$productData['name']}</strong> adalah produk unggulan kami dari kategori {$category->name}.</p>
+                <p>Produk ini dibuat dengan material berkualitas tinggi dan dikerjakan oleh pengrajin berpengalaman.</p>
+                <h4>Spesifikasi:</h4>
+                <ul>
+                    <li>Material: Premium Quality</li>
+                    <li>Berat: " . ($productData['weight'] / 1000) . " kg</li>
+                    <li>Garansi: 1 Tahun</li>
+                    <li>Made in Indonesia</li>
+                </ul>
+                <h4>Keunggulan:</h4>
+                <ul>
+                    <li>Kualitas terjamin</li>
+                    <li>Harga bersaing</li>
+                    <li>Pengiriman cepat</li>
+                    <li>Pelayanan ramah</li>
+                </ul>
+            ";
+
+            Product::create([
+                'category_id' => $category->id,
+                'name' => $productData['name'],
+                'slug' => $slug,
+                'short_description' => $shortDescription,
+                'description' => $description,
+                'price' => $productData['price'],
+                'discount_price' => $productData['discount_price'] ?? null,
+                'stock' => $productData['stock'],
+                'weight' => $productData['weight'],
+                'status' => $productData['status'],
+                'is_published' => true,
+                'views' => rand(10, 500),
+            ]);
+
+            $createdCount++;
         }
 
-        $this->command->info('✅ ' . $productCount . ' produk berhasil dibuat!');
+        $this->command->info('');
+        if ($createdCount > 0) {
+            $this->command->info("✅ Berhasil membuat {$createdCount} produk baru!");
+        }
+        if ($skippedCount > 0) {
+            $this->command->warn("⚠️  {$skippedCount} produk di-skip (sudah ada)");
+        }
+        if ($createdCount === 0 && $skippedCount > 0) {
+            $this->command->info("ℹ️  Semua produk sudah ada di database");
+        }
+        $this->command->info('');
+        $this->command->warn('⚠️  Catatan: Gambar produk belum diupload. Akan menggunakan default image.');
     }
-}
+}php artisan db:seed --class=ProductSeeder
