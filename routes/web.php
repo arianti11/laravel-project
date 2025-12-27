@@ -26,6 +26,10 @@ Route::get('/', function () {
     return view('index');
 })->name('home');
 
+// Public Product Routes
+Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{slug}', [App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
+
 // ==========================================
 // AUTHENTICATION ROUTES
 // ==========================================

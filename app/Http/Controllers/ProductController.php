@@ -3,57 +3,88 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    /**
+     * Display product detail
+     */
+    public function show($slug)
     {
-        $products = Product::all();
-        return response()->json($products);
+        // Get product by slug
+        $product = Product::with(['category', 'images'])
+            ->where('slug', $slug)
+            ->where('is_published', true)
+            ->firstOrFail();
+
+        // Increment views
+        $product->incrementViews();
+
+        // Get related products (same category, exclude current product)
+        $relatedProducts = Product::with('category')
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('is_published', true)
+            ->inStock()
+            ->take(4)
+            ->get();
+
+        return view('products.show', compact('product', 'relatedProducts'));
     }
 
-    public function show($id)
+    /**
+     * Display product list
+     */
+    public function index(Request $request)
     {
-        $product = Product::findOrFail($id);
-        return response()->json($product);
-    }
+        $query = Product::with('category')
+            ->where('is_published', true);
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'code' => 'required|string|max:50|unique:products',
-            'name' => 'required|string|max:200',
-            'slug' => 'required|string|max:200|unique:products',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-            // tambahkan validasi lain sesuai kebutuhan
-        ]);
-        $product = Product::create($validated);
-        return response()->json($product, 201);
-    }
+        // Filter by category
+        if ($request->filled('category')) {
+            $category = Category::where('slug', $request->category)->first();
+            if ($category) {
+                $query->where('category_id', $category->id);
+            }
+        }
 
-    public function update(Request $request, $id)
-    {
-        $product = Product::findOrFail($id);
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'code' => 'required|string|max:50|unique:products,code,' . $id,
-            'name' => 'required|string|max:200',
-            'slug' => 'required|string|max:200|unique:products,slug,' . $id,
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-            // tambahkan validasi lain sesuai kebutuhan
-        ]);
-        $product->update($validated);
-        return response()->json($product);
-    }
+        // Search
+        if ($request->filled('search')) {
+            $query->search($request->search);
+        }
 
-    public function destroy($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->delete();
-        return response()->json(['message' => 'Product deleted']);
+        // Filter by price range
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Sort
+        $sort = $request->get('sort', 'latest');
+        switch ($sort) {
+            case 'price_low':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price_high':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'popular':
+                $query->orderBy('views', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('name', 'asc');
+                break;
+            default:
+                $query->latest();
+        }
+
+        $products = $query->paginate(12);
+        $categories = Category::active()->withCount('products')->get();
+
+        return view('products.index', compact('products', 'categories'));
     }
 }

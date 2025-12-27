@@ -1,203 +1,218 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Kategori')
-@section('page-title', 'Manajemen Kategori')
+@section('title', 'Kelola Kategori')
 
 @section('content')
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                <div>
-                    <h5 class="mb-0 fw-bold">
-                        <i class="fas fa-folder text-primary me-2"></i>Daftar Kategori
-                    </h5>
-                    <small class="text-muted">Kelola kategori produk kerajinan</small>
-                </div>
-                <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Tambah Kategori
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Kelola Kategori</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 bg-transparent p-0">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Kategori</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Tambah Kategori
+        </a>
+    </div>
+
+    <!-- Categories Table -->
+    <div class="card shadow">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Daftar Kategori 
+                <span class="badge bg-primary">{{ $categories->total() }}</span>
+            </h6>
+            
+            <!-- Search -->
+            <form method="GET" action="{{ route('admin.categories.index') }}" class="d-flex">
+                <input type="text" 
+                       name="search" 
+                       class="form-control form-control-sm me-2" 
+                       placeholder="Cari kategori..."
+                       value="{{ request('search') }}"
+                       style="width: 200px;">
+                <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="fas fa-search"></i>
+                </button>
+                @if(request('search'))
+                <a href="{{ route('admin.categories.index') }}" class="btn btn-sm btn-secondary ms-2">
+                    <i class="fas fa-redo"></i>
                 </a>
-            </div>
-
-            <div class="card-body">
-                <!-- Filter & Search -->
-                <form method="GET" action="{{ route('admin.categories.index') }}" class="mb-4">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                                <input type="text" 
-                                       name="search" 
-                                       class="form-control" 
-                                       placeholder="Cari kategori..." 
-                                       value="{{ request('search') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <select name="status" class="form-select">
-                                <option value="">Semua Status</option>
-                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
-                                <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Tidak Aktif</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary flex-fill">
-                                    <i class="fas fa-filter me-1"></i>Filter
-                                </button>
-                                <a href="{{ route('admin.categories.index') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-redo"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th width="5%">No</th>
-                                <th width="25%">Nama Kategori</th>
-                                <th width="35%">Deskripsi</th>
-                                <th width="10%" class="text-center">Produk</th>
-                                <th width="10%" class="text-center">Status</th>
-                                <th width="15%" class="text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($categories as $category)
-                            <tr>
-                                <td>{{ $loop->iteration + ($categories->currentPage() - 1) * $categories->perPage() }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="fas fa-folder fa-2x text-primary"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">{{ $category->name }}</h6>
-                                            <small class="text-muted">{{ $category->slug }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <small class="text-muted">
-                                        {{ Str::limit($category->description ?? 'Tidak ada deskripsi', 80) }}
-                                    </small>
-                                </td>
-                                <td class="text-center">
-                                    <span class="badge bg-primary rounded-pill">
-                                        {{ $category->products_count }} produk
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    @if($category->is_active)
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check-circle me-1"></i>Aktif
-                                        </span>
-                                    @else
-                                        <span class="badge bg-secondary">
-                                            <i class="fas fa-times-circle me-1"></i>Tidak Aktif
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.categories.edit', $category->id) }}" 
-                                           class="btn btn-outline-warning"
-                                           data-bs-toggle="tooltip" 
-                                           title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button type="button" 
-                                                class="btn btn-outline-danger"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#deleteModal{{ $category->id }}"
-                                                title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteModal{{ $category->id }}" tabindex="-1">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header border-0">
-                                            <h5 class="modal-title">
-                                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                                                Konfirmasi Hapus
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p class="mb-0">Apakah Anda yakin ingin menghapus kategori <strong>{{ $category->name }}</strong>?</p>
-                                            @if($category->products_count > 0)
-                                                <div class="alert alert-warning mt-3 mb-0">
-                                                    <i class="fas fa-info-circle me-2"></i>
-                                                    Kategori ini memiliki <strong>{{ $category->products_count }} produk</strong> dan tidak bisa dihapus!
-                                                </div>
-                                            @endif
-                                        </div>
-                                        <div class="modal-footer border-0">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                Batal
-                                            </button>
-                                            @if($category->products_count == 0)
-                                            <form action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger">
-                                                    <i class="fas fa-trash me-1"></i>Hapus
-                                                </button>
-                                            </form>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @empty
-                            <tr>
-                                <td colspan="6" class="text-center py-5">
-                                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-                                    <h6 class="text-muted">Belum ada kategori</h6>
-                                    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary mt-2">
-                                        <i class="fas fa-plus me-2"></i>Tambah Kategori Pertama
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                @if($categories->hasPages())
-                <div class="d-flex justify-content-between align-items-center mt-4">
-                    <div class="text-muted">
-                        Menampilkan {{ $categories->firstItem() }} - {{ $categories->lastItem() }} dari {{ $categories->total() }} kategori
-                    </div>
-                    <div>
-                        {{ $categories->links() }}
-                    </div>
-                </div>
                 @endif
+            </form>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 10%">Icon</th>
+                            <th style="width: 25%">Nama Kategori</th>
+                            <th style="width: 20%">Slug</th>
+                            <th style="width: 30%">Deskripsi</th>
+                            <th style="width: 10%">Status</th>
+                            <th style="width: 15%" class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($categories as $index => $category)
+                        <tr>
+                            <td>{{ $categories->firstItem() + $index }}</td>
+                            <td>
+                                @if($category->icon)
+                                <img src="{{ $category->icon_url }}" 
+                                     alt="{{ $category->name }}"
+                                     class="rounded"
+                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                @else
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="fw-bold">{{ $category->name }}</div>
+                                <small class="text-muted">
+                                    <i class="fas fa-box me-1"></i>
+                                    {{ $category->products_count }} produk
+                                </small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    {{ $category->slug }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ Str::limit($category->description, 50) }}
+                                </small>
+                            </td>
+                            <td>
+                                @if($category->is_active)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        Nonaktif
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ route('admin.categories.show', $category) }}" 
+                                       class="btn btn-info"
+                                       title="Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ route('admin.categories.edit', $category) }}" 
+                                       class="btn btn-warning"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" 
+                                            class="btn btn-danger"
+                                            onclick="deleteCategory({{ $category->id }})"
+                                            title="Hapus"
+                                            {{ $category->products_count > 0 ? 'disabled' : '' }}>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <form id="delete-form-{{ $category->id }}" 
+                                      action="{{ route('admin.categories.destroy', $category) }}" 
+                                      method="POST" 
+                                      style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-tags fa-3x mb-3"></i>
+                                    <p class="mb-0">Belum ada kategori</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
+
+            <!-- Pagination -->
+            @if($categories->hasPages())
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Menampilkan {{ $categories->firstItem() }} - {{ $categories->lastItem() }} 
+                    dari {{ $categories->total() }} kategori
+                </div>
+                <div>
+                    {{ $categories->links() }}
+                </div>
+            </div>
+            @endif
         </div>
     </div>
+
+    <!-- Info Alert -->
+    <div class="alert alert-info mt-3" role="alert">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Info:</strong> Kategori yang memiliki produk tidak dapat dihapus. Hapus atau pindahkan produk terlebih dahulu.
+    </div>
 </div>
-@endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Tooltip
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
+function deleteCategory(id) {
+    Swal.fire({
+        title: 'Hapus Kategori?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+
+// Show success message if exists
+@if(session('success'))
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session('success') }}',
+        timer: 3000,
+        showConfirmButton: false
+    });
+@endif
+
+@if(session('error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Gagal!',
+        text: '{{ session('error') }}',
+        timer: 3000,
+        showConfirmButton: false
+    });
+@endif
 </script>
 @endpush
+@endsection

@@ -5,44 +5,35 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     * Menampilkan daftar semua kategori
+     * Display a listing of categories
      */
     public function index(Request $request)
     {
-        // Query dasar
-        $query = Category::query();
+        $query = Category::withCount('products');
 
-        // Search berdasarkan nama
-        if ($request->has('search') && $request->search != '') {
+        // Search
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('name', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
                   ->orWhere('description', 'like', "%{$search}%");
+            });
         }
 
-        // Filter berdasarkan status
-        if ($request->has('status') && $request->status != '') {
-            $status = $request->status == 'active' ? 1 : 0;
-            $query->where('is_active', $status);
-        }
-
-        // Pagination dengan sorting terbaru
         $categories = $query->latest()->paginate(10);
-
-        // Append query string ke pagination links
-        $categories->appends($request->all());
 
         return view('admin.categories.index', compact('categories'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     * Menampilkan form tambah kategori
+     * Show the form for creating a new category
      */
     public function create()
     {
@@ -50,114 +41,132 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     * Menyimpan kategori baru ke database
+     * Store a newly created category
      */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:categories,name',
-            'description' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
-        ], [
-            'name.required' => 'Nama kategori wajib diisi',
-            'name.unique' => 'Nama kategori sudah ada',
-            'name.max' => 'Nama kategori maksimal 100 karakter',
-            'description.max' => 'Deskripsi maksimal 500 karakter',
         ]);
 
-        // Generate slug otomatis dari nama
+        // Generate slug
         $validated['slug'] = Str::slug($validated['name']);
 
-        // Set default is_active jika tidak ada
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
+        // Check if slug already exists
+        $slugCount = Category::where('slug', $validated['slug'])->count();
+        if ($slugCount > 0) {
+            $validated['slug'] = $validated['slug'] . '-' . ($slugCount + 1);
+        }
 
-        // Simpan ke database
+        // Upload icon if provided
+        if ($request->hasFile('icon')) {
+            $validated['icon'] = $request->file('icon')->store('categories', 'public');
+        }
+
+        // Set is_active (checkbox)
+        $validated['is_active'] = $request->has('is_active');
+
         Category::create($validated);
 
-        // Redirect dengan pesan sukses
-        return redirect()->route('admin.categories.index')
+        return redirect()
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil ditambahkan!');
     }
 
     /**
-     * Display the specified resource.
-     * Menampilkan detail kategori (optional)
+     * Display the specified category
      */
     public function show(Category $category)
     {
-        // Load relasi products
-        $category->load('products');
+        $category->loadCount('products');
         
-        return view('admin.categories.show', compact('category'));
+        // Get products in this category
+        $products = $category->products()
+            ->with('category')
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.categories.show', compact('category', 'products'));
     }
 
     /**
-     * Show the form for editing the specified resource.
-     * Menampilkan form edit kategori
+     * Show the form for editing the category
      */
     public function edit(Category $category)
     {
+        $category->loadCount('products');
         return view('admin.categories.edit', compact('category'));
     }
 
     /**
-     * Update the specified resource in storage.
-     * Update data kategori
+     * Update the specified category
      */
     public function update(Request $request, Category $category)
     {
-        // Validasi input (kecuali nama yang sama dengan kategori ini)
         $validated = $request->validate([
             'name' => 'required|string|max:100|unique:categories,name,' . $category->id,
-            'description' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
-        ], [
-            'name.required' => 'Nama kategori wajib diisi',
-            'name.unique' => 'Nama kategori sudah ada',
-            'name.max' => 'Nama kategori maksimal 100 karakter',
-            'description.max' => 'Deskripsi maksimal 500 karakter',
         ]);
 
-        // Update slug jika nama berubah
-        if ($validated['name'] != $category->name) {
+        // Update slug if name changed
+        if ($validated['name'] !== $category->name) {
             $validated['slug'] = Str::slug($validated['name']);
+            
+            // Check if new slug already exists
+            $slugCount = Category::where('slug', $validated['slug'])
+                ->where('id', '!=', $category->id)
+                ->count();
+            
+            if ($slugCount > 0) {
+                $validated['slug'] = $validated['slug'] . '-' . ($slugCount + 1);
+            }
+        }
+
+        // Upload new icon if provided
+        if ($request->hasFile('icon')) {
+            // Delete old icon
+            if ($category->icon) {
+                Storage::disk('public')->delete($category->icon);
+            }
+            $validated['icon'] = $request->file('icon')->store('categories', 'public');
         }
 
         // Set is_active
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
+        $validated['is_active'] = $request->has('is_active');
 
-        // Update ke database
         $category->update($validated);
 
-        // Redirect dengan pesan sukses
-        return redirect()->route('admin.categories.index')
+        return redirect()
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil diupdate!');
     }
 
     /**
-     * Remove the specified resource from storage.
-     * Hapus kategori (soft delete)
+     * Remove the specified category
      */
     public function destroy(Category $category)
     {
-        try {
-            // Cek apakah kategori punya produk
-            if ($category->products()->count() > 0) {
-                return redirect()->route('admin.categories.index')
-                    ->with('error', 'Kategori tidak bisa dihapus karena masih memiliki ' . $category->products()->count() . ' produk!');
-            }
-
-            // Soft delete
-            $category->delete();
-
-            return redirect()->route('admin.categories.index')
-                ->with('success', 'Kategori berhasil dihapus!');
-
-        } catch (\Exception $e) {
-            return redirect()->route('admin.categories.index')
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        // Check if category has products
+        if ($category->products()->count() > 0) {
+            return redirect()
+                ->route('admin.categories.index')
+                ->with('error', 'Kategori tidak dapat dihapus karena masih memiliki produk. Hapus atau pindahkan produk terlebih dahulu.');
         }
+
+        // Delete icon if exists
+        if ($category->icon) {
+            Storage::disk('public')->delete($category->icon);
+        }
+
+        $category->delete();
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', 'Kategori berhasil dihapus!');
     }
 }

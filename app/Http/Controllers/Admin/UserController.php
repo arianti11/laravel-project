@@ -6,47 +6,52 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of users
      */
     public function index(Request $request)
     {
         $query = User::query();
 
         // Search
-        if ($request->has('search') && $request->search != '') {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
-            });
+        if ($request->filled('search')) {
+            $query->search($request->search);
         }
 
-        // Filter by Role
-        if ($request->has('role') && $request->role != '') {
+        // Filter by role
+        if ($request->filled('role')) {
             $query->where('role', $request->role);
         }
 
-        // Filter by Status
-        if ($request->has('status') && $request->status != '') {
-            $status = $request->status == 'active' ? 1 : 0;
-            $query->where('is_active', $status);
+        // Filter by status
+        if ($request->filled('status')) {
+            if ($request->status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($request->status === 'inactive') {
+                $query->where('is_active', false);
+            }
         }
 
-        // Pagination
-        $users = $query->latest()->paginate(10);
-        $users->appends($request->all());
+        $users = $query->latest()->paginate(15);
 
-        return view('admin.users.index', compact('users'));
+        // Statistics
+        $stats = [
+            'admin' => User::admin()->count(),
+            'staff' => User::staff()->count(),
+            'customer' => User::customer()->count(),
+            'total' => User::count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'stats'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new user
      */
     public function create()
     {
@@ -54,43 +59,47 @@ class UserController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created user
      */
     public function store(Request $request)
     {
-        // Validasi
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|min:10|max:15',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,user',
+            'role' => 'required|in:admin,staff,user',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
-        ], [
-            'name.required' => 'Nama wajib diisi',
-            'email.required' => 'Email wajib diisi',
-            'email.unique' => 'Email sudah terdaftar',
-            'phone.required' => 'Nomor telepon wajib diisi',
-            'password.required' => 'Password wajib diisi',
-            'password.min' => 'Password minimal 8 karakter',
-            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'email_verified' => 'boolean',
         ]);
 
         // Hash password
         $validated['password'] = Hash::make($validated['password']);
-        
-        // Set is_active
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        // Simpan user
+        // Upload avatar if provided
+        if ($request->hasFile('avatar')) {
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        // Set is_active
+        $validated['is_active'] = $request->has('is_active');
+
+        // Set email_verified_at
+        if ($request->has('email_verified')) {
+            $validated['email_verified_at'] = now();
+        }
+        unset($validated['email_verified']);
+
         User::create($validated);
 
-        return redirect()->route('admin.users.index')
+        return redirect()
+            ->route('admin.users.index')
             ->with('success', 'User berhasil ditambahkan!');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified user
      */
     public function show(User $user)
     {
@@ -98,7 +107,7 @@ class UserController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the user
      */
     public function edit(User $user)
     {
@@ -106,65 +115,82 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified user
      */
     public function update(Request $request, User $user)
     {
-        // Validasi
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => 'required|string|min:10|max:15',
+            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|in:admin,user',
+            'role' => 'required|in:admin,staff,user',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
-        ], [
-            'name.required' => 'Nama wajib diisi',
-            'email.required' => 'Email wajib diisi',
-            'email.unique' => 'Email sudah terdaftar',
-            'phone.required' => 'Nomor telepon wajib diisi',
-            'password.min' => 'Password minimal 8 karakter',
-            'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'email_verified' => 'boolean',
         ]);
 
-        // Hash password jika diisi
+        // Prevent user from changing their own role or status
+        if ($user->id === auth()->id()) {
+            $validated['role'] = $user->role;
+            $validated['is_active'] = true;
+        }
+
+        // Update password only if provided
         if ($request->filled('password')) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
         }
-        
-        // Set is_active
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        // Update user
+        // Upload new avatar if provided
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        // Set is_active
+        $validated['is_active'] = $request->has('is_active');
+
+        // Update email_verified_at
+        if ($request->has('email_verified') && !$user->email_verified_at) {
+            $validated['email_verified_at'] = now();
+        } elseif (!$request->has('email_verified') && $user->email_verified_at) {
+            $validated['email_verified_at'] = null;
+        }
+        unset($validated['email_verified']);
+
         $user->update($validated);
 
-        return redirect()->route('admin.users.index')
+        return redirect()
+            ->route('admin.users.index')
             ->with('success', 'User berhasil diupdate!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified user
      */
     public function destroy(User $user)
     {
-        try {
-            // Cek apakah user yang login mencoba hapus dirinya sendiri
-            if ($user->id == auth()->id()) {
-                return redirect()->route('admin.users.index')
-                    ->with('error', 'Anda tidak bisa menghapus akun Anda sendiri!');
-            }
-
-            // Soft delete
-            $user->delete();
-
-            return redirect()->route('admin.users.index')
-                ->with('success', 'User berhasil dihapus!');
-
-        } catch (\Exception $e) {
-            return redirect()->route('admin.users.index')
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        // Prevent user from deleting themselves
+        if ($user->id === auth()->id()) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'Anda tidak dapat menghapus akun sendiri!');
         }
+
+        // Delete avatar if exists
+        if ($user->avatar) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->delete();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User berhasil dihapus!');
     }
 }
