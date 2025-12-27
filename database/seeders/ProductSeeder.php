@@ -274,4 +274,4 @@ class ProductSeeder extends Seeder
         $this->command->info('');
         $this->command->warn('⚠️  Catatan: Gambar produk belum diupload. Akan menggunakan default image.');
     }
-}php artisan db:seed --class=ProductSeeder
+}
