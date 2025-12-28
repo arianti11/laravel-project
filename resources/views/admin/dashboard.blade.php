@@ -1,60 +1,76 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard Admin')
+@section('title', 'Admin Dashboard')
 
 @section('content')
 <div class="container-fluid">
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0 text-gray-800">Dashboard Admin</h1>
-            <p class="text-muted mb-0">Selamat datang, {{ auth()->user()->name }}!</p>
+            <h2 class="fw-bold mb-0">Dashboard</h2>
+            <p class="text-muted">Welcome back, {{ auth()->user()->name }}!</p>
         </div>
         <div>
-            <span class="badge bg-danger px-3 py-2">
-                <i class="fas fa-crown me-1"></i> Administrator
-            </span>
+            <span class="badge bg-primary">{{ now()->format('d M Y') }}</span>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row g-3 mb-4">
-        <!-- Total Products -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-left-primary shadow h-100 py-2">
+    <!-- Statistics Cards Row 1 -->
+    <div class="row mb-4">
+        <!-- Total Revenue -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Produk
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $totalProducts ?? 0 }}
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Revenue</p>
+                            <h4 class="fw-bold mb-0">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</h4>
+                            <small class="text-success">
+                                <i class="fas fa-arrow-up"></i> This Month: Rp {{ number_format($stats['monthly_revenue'], 0, ',', '.') }}
+                            </small>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-box fa-2x text-gray-300"></i>
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-dollar-sign fa-2x text-primary"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Total Categories -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-left-success shadow h-100 py-2">
+        <!-- Total Orders -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Kategori
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $totalCategories ?? 0 }}
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Orders</p>
+                            <h4 class="fw-bold mb-0">{{ $stats['total_orders'] }}</h4>
+                            <small class="text-warning">
+                                <i class="fas fa-clock"></i> Pending: {{ $stats['pending_orders'] }}
+                            </small>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-tags fa-2x text-gray-300"></i>
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-shopping-cart fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Products -->
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Products</p>
+                            <h4 class="fw-bold mb-0">{{ $stats['total_products'] }}</h4>
+                            <small class="text-danger">
+                                <i class="fas fa-exclamation-triangle"></i> Low Stock: {{ $stats['low_stock_products'] }}
+                            </small>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-box fa-2x text-warning"></i>
                         </div>
                     </div>
                 </div>
@@ -62,41 +78,19 @@
         </div>
 
         <!-- Total Users -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-left-info shadow h-100 py-2">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total User
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $totalUsers ?? 0 }}
-                            </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1 small">Total Customers</p>
+                            <h4 class="fw-bold mb-0">{{ $stats['total_users'] }}</h4>
+                            <small class="text-info">
+                                <i class="fas fa-layer-group"></i> Categories: {{ $stats['total_categories'] }}
+                            </small>
                         </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Total Staff -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Total Staff
-                            </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                {{ $totalStaff ?? 0 }}
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                            <i class="fas fa-users fa-2x text-info"></i>
                         </div>
                     </div>
                 </div>
@@ -104,68 +98,77 @@
         </div>
     </div>
 
-    <!-- Recent Activity & Quick Actions -->
-    <div class="row g-3">
-        <!-- Recent Products -->
-        <div class="col-lg-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Produk Terbaru</h6>
-                    <a href="{{ route('admin.products.index') }}" class="btn btn-sm btn-primary">
-                        Lihat Semua
-                    </a>
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Sales Chart -->
+        <div class="col-md-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Monthly Sales (Last 6 Months)</h5>
                 </div>
                 <div class="card-body">
+                    <canvas id="salesChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Top Selling Products</h5>
+                </div>
+                <div class="card-body">
+                    @foreach($topProducts as $product)
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <strong>{{ Str::limit($product->product_name, 20) }}</strong>
+                                <br>
+                                <small class="text-muted">{{ $product->total_sold }} sold</small>
+                            </div>
+                            <span class="badge bg-primary">{{ $product->total_sold }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders & Activities -->
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-md-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    <a href="{{ route('admin.orders.index') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Produk</th>
-                                    <th>Kategori</th>
-                                    <th>Harga</th>
-                                    <th>Stok</th>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
                                     <th>Status</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($recentProducts ?? [] as $product)
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ $product->image_url }}" 
-                                                 alt="{{ $product->name }}" 
-                                                 class="rounded me-2"
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
-                                            <div>
-                                                <div class="fw-bold">{{ $product->name }}</div>
-                                                <small class="text-muted">{{ $product->code }}</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary">
-                                            {{ $product->category->name }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $product->formatted_price }}</td>
-                                    <td>
-                                        <span class="badge {{ $product->stock > 10 ? 'bg-success' : 'bg-warning' }}">
-                                            {{ $product->stock }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ $product->status_badge }}">
-                                            {{ ucfirst($product->status) }}
-                                        </span>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">
-                                        Belum ada produk
-                                    </td>
-                                </tr>
-                                @endforelse
+                                @foreach($recentOrders as $order)
+                                    <tr>
+                                        <td><strong>{{ $order->order_number }}</strong></td>
+                                        <td>{{ $order->customer_name }}</td>
+                                        <td><strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong></td>
+                                        <td>
+                                            <span class="badge bg-{{ $order->status_badge }}">
+                                                {{ ucfirst($order->status) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $order->created_at->format('d M Y') }}</td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -173,71 +176,97 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+        <!-- Recent Activities & Low Stock -->
+        <div class="col-md-4">
+            <!-- Low Stock Alert -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <h6 class="mb-0 text-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Low Stock Alert
+                    </h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i> Tambah Produk
-                        </a>
-                        <a href="{{ route('admin.categories.create') }}" class="btn btn-success">
-                            <i class="fas fa-plus me-2"></i> Tambah Kategori
-                        </a>
-                        <a href="{{ route('admin.users.create') }}" class="btn btn-info">
-                            <i class="fas fa-user-plus me-2"></i> Tambah User
-                        </a>
-                        <a href="{{ route('admin.activity-logs') }}" class="btn btn-warning">
-                            <i class="fas fa-history me-2"></i> Activity Logs
-                        </a>
-                        <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-cog me-2"></i> Settings
-                        </a>
-                    </div>
+                    @forelse($lowStockProducts as $product)
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <small><strong>{{ Str::limit($product->name, 20) }}</strong></small>
+                                <br>
+                                <small class="text-muted">{{ $product->category->name }}</small>
+                            </div>
+                            <span class="badge bg-danger">{{ $product->stock }} left</span>
+                        </div>
+                    @empty
+                        <p class="text-muted text-center mb-0">All products in stock!</p>
+                    @endforelse
                 </div>
             </div>
 
-            <!-- System Info -->
-            <div class="card shadow">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">System Info</h6>
+            <!-- Recent Activities -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Recent Activities</h6>
+                    <a href="{{ route('admin.activity-logs') }}" class="btn btn-sm btn-outline-primary">View All</a>
                 </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <small class="text-muted">Laravel Version:</small>
-                            <div class="fw-bold">{{ app()->version() }}</div>
-                        </li>
-                        <li class="mb-2">
-                            <small class="text-muted">PHP Version:</small>
-                            <div class="fw-bold">{{ phpversion() }}</div>
-                        </li>
-                        <li>
-                            <small class="text-muted">Last Login:</small>
-                            <div class="fw-bold">{{ now()->format('d M Y, H:i') }}</div>
-                        </li>
-                    </ul>
+                <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                    @foreach($recentActivities as $activity)
+                        <div class="d-flex mb-3">
+                            <div class="bg-{{ $activity->type_badge }} bg-opacity-10 rounded-circle p-2 me-2" style="width: 35px; height: 35px;">
+                                <i class="fas {{ $activity->type_icon }} text-{{ $activity->type_badge }}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <small>
+                                    <strong>{{ $activity->user->name ?? 'System' }}</strong>
+                                    {{ $activity->description }}
+                                </small>
+                                <br>
+                                <small class="text-muted">{{ $activity->created_at->diffForHumans() }}</small>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-.border-left-primary {
-    border-left: 4px solid #4e73df !important;
-}
-.border-left-success {
-    border-left: 4px solid #1cc88a !important;
-}
-.border-left-info {
-    border-left: 4px solid #36b9cc !important;
-}
-.border-left-warning {
-    border-left: 4px solid #f6c23e !important;
-}
-</style>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Sales Chart
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {!! json_encode($monthlySales->pluck('month')) !!},
+        datasets: [{
+            label: 'Orders',
+            data: {!! json_encode($monthlySales->pluck('total_orders')) !!},
+            borderColor: 'rgb(79, 70, 229)',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            tension: 0.4
+        }, {
+            label: 'Revenue (Rp)',
+            data: {!! json_encode($monthlySales->pluck('total_revenue')) !!},
+            borderColor: 'rgb(16, 185, 129)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+@endpush
