@@ -88,10 +88,10 @@
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link position-relative" href="/cart">
+                        <a class="nav-link position-relative" href="{{ route('cart.index') }}">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                0
+                            <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ array_sum(array_column(session()->get('cart', []), 'quantity')) }}
                             </span>
                         </a>
                     </li>
