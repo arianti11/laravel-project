@@ -1,326 +1,208 @@
-@extends('layouts.public')
+@extends('layouts.customer')
 
-@section('title', $product->name)
+@section('title', $product->name . ' - UMKM Shop')
 
 @section('content')
-<div class="container py-5">
+<div class="container">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item"><a href="/products">Products</a></li>
-            <li class="breadcrumb-item"><a href="/products?category={{ $product->category->slug }}">{{ $product->category->name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('products.index') }}">Products</a></li>
             <li class="breadcrumb-item active">{{ $product->name }}</li>
         </ol>
     </nav>
 
-    <div class="row g-5">
+    <div class="row">
         <!-- Product Images -->
-        <div class="col-lg-6">
-            <div class="product-images">
-                <!-- Main Image -->
-                <div class="main-image mb-3">
-                    <img id="mainProductImage" 
-                         src="{{ $product->image_url }}" 
-                         alt="{{ $product->name }}"
-                         class="img-fluid rounded shadow"
-                         style="width: 100%; height: 500px; object-fit: cover;">
-                    
-                    <!-- Badges -->
-                    <div class="position-absolute top-0 start-0 m-3">
-                        @if($product->is_on_sale)
-                        <span class="badge bg-danger fs-6 mb-2">
-                            SALE {{ $product->discount_percentage }}%
-                        </span>
-                        @endif
-                        
-                        @if($product->status == 'preorder')
-                        <span class="badge bg-warning fs-6">
-                            Pre-Order
-                        </span>
-                        @elseif($product->status == 'sold_out' || $product->stock == 0)
-                        <span class="badge bg-secondary fs-6">
-                            Sold Out
-                        </span>
-                        @elseif($product->stock <= 5)
-                        <span class="badge bg-warning fs-6">
-                            Only {{ $product->stock }} Left!
-                        </span>
-                        @endif
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                <div class="card-body">
+                    <!-- Main Image -->
+                    <div class="mb-3">
+                        <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/500' }}" 
+                             class="img-fluid rounded" 
+                             id="main-image"
+                             alt="{{ $product->name }}">
                     </div>
-                </div>
 
-                <!-- Thumbnail Gallery -->
-                @if($product->images->count() > 0)
-                <div class="row g-2 thumbnail-gallery">
-                    <!-- Main Image Thumbnail -->
-                    <div class="col-3">
-                        <img src="{{ $product->image_url }}" 
-                             alt="{{ $product->name }}"
-                             class="img-thumbnail thumbnail-item active"
-                             onclick="changeMainImage('{{ $product->image_url }}')"
-                             style="cursor: pointer; height: 100px; object-fit: cover; width: 100%;">
-                    </div>
-                    
-                    <!-- Additional Images -->
-                    @foreach($product->images as $image)
-                    <div class="col-3">
-                        <img src="{{ $image->image_url }}" 
-                             alt="{{ $product->name }}"
-                             class="img-thumbnail thumbnail-item"
-                             onclick="changeMainImage('{{ $image->image_url }}')"
-                             style="cursor: pointer; height: 100px; object-fit: cover; width: 100%;">
-                    </div>
-                    @endforeach
+                    <!-- Thumbnail Images -->
+                    @if($product->images->count() > 0)
+                        <div class="row g-2">
+                            <!-- Main Image Thumbnail -->
+                            <div class="col-3">
+                                <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/100' }}" 
+                                     class="img-fluid rounded cursor-pointer thumbnail-img active" 
+                                     onclick="changeImage(this.src)">
+                            </div>
+                            
+                            <!-- Additional Images -->
+                            @foreach($product->images as $image)
+                                <div class="col-3">
+                                    <img src="{{ asset('storage/' . $image->image) }}" 
+                                         class="img-fluid rounded cursor-pointer thumbnail-img" 
+                                         onclick="changeImage(this.src)">
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
-                @endif
             </div>
         </div>
 
         <!-- Product Info -->
-        <div class="col-lg-6">
-            <!-- Category -->
-            <div class="mb-2">
-                <a href="/products?category={{ $product->category->slug }}" 
-                   class="badge bg-primary text-decoration-none">
-                    <i class="fas fa-tag me-1"></i>
-                    {{ $product->category->name }}
-                </a>
-            </div>
-
-            <!-- Product Name -->
-            <h1 class="display-5 fw-bold mb-3">{{ $product->name }}</h1>
-
-            <!-- Code & Views -->
-            <div class="d-flex align-items-center text-muted mb-3">
-                <small class="me-3">
-                    <i class="fas fa-barcode me-1"></i>
-                    {{ $product->code }}
-                </small>
-                <small>
-                    <i class="fas fa-eye me-1"></i>
-                    {{ $product->views }} views
-                </small>
-            </div>
-
-            <!-- Short Description -->
-            @if($product->short_description)
-            <p class="lead text-muted mb-4">{{ $product->short_description }}</p>
-            @endif
-
-            <!-- Price -->
-            <div class="mb-4">
-                @if($product->is_on_sale)
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <h2 class="text-success fw-bold mb-0">{{ $product->formatted_discount_price }}</h2>
-                    <h4 class="text-muted text-decoration-line-through mb-0">{{ $product->formatted_price }}</h4>
-                    <span class="badge bg-danger fs-6">
-                        Save {{ $product->discount_percentage }}%
-                    </span>
-                </div>
-                @else
-                <h2 class="text-success fw-bold mb-2">{{ $product->formatted_price }}</h2>
-                @endif
-            </div>
-
-            <!-- Stock & Status -->
-            <div class="mb-4">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="text-muted small mb-1">Stock</div>
-                            @if($product->stock > 10)
-                                <div class="h5 text-success mb-0">
-                                    <i class="fas fa-check-circle me-1"></i>
-                                    Available
-                                </div>
-                            @elseif($product->stock > 0)
-                                <div class="h5 text-warning mb-0">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                    {{ $product->stock }} left
-                                </div>
-                            @else
-                                <div class="h5 text-danger mb-0">
-                                    <i class="fas fa-times-circle me-1"></i>
-                                    Sold Out
-                                </div>
-                            @endif
-                        </div>
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <!-- Category & Code -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary">{{ $product->category->name }}</span>
+                        <small class="text-muted">Kode: {{ $product->code }}</small>
                     </div>
-                    <div class="col-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="text-muted small mb-1">Weight</div>
-                            <div class="h5 mb-0">
-                                @if($product->weight)
-                                    {{ $product->weight >= 1000 ? number_format($product->weight/1000, 1) . ' kg' : $product->weight . ' gr' }}
+
+                    <!-- Product Name -->
+                    <h2 class="fw-bold mb-3">{{ $product->name }}</h2>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+                        @if($product->discount_price)
+                            <div class="d-flex align-items-center gap-3">
+                                <h3 class="text-primary mb-0 fw-bold">
+                                    Rp {{ number_format($product->discount_price, 0, ',', '.') }}
+                                </h3>
+                                <h5 class="text-muted text-decoration-line-through mb-0">
+                                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                                </h5>
+                                <span class="badge bg-danger">
+                                    HEMAT {{ number_format((($product->price - $product->discount_price) / $product->price) * 100, 0) }}%
+                                </span>
+                            </div>
+                        @else
+                            <h3 class="text-primary fw-bold">
+                                Rp {{ number_format($product->price, 0, ',', '.') }}
+                            </h3>
+                        @endif
+                    </div>
+
+                    <!-- Status & Stock -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Status:</strong>
+                                @if($product->status == 'ready')
+                                    <span class="badge bg-success">Ready Stock</span>
+                                @elseif($product->status == 'preorder')
+                                    <span class="badge bg-warning text-dark">Pre-Order</span>
                                 @else
-                                    -
+                                    <span class="badge bg-secondary">Sold Out</span>
                                 @endif
-                            </div>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2">
+                                <strong>Stok:</strong>
+                                @if($product->stock > 10)
+                                    <span class="text-success">{{ $product->stock }} unit</span>
+                                @elseif($product->stock > 0)
+                                    <span class="text-warning">{{ $product->stock }} unit (Terbatas!)</span>
+                                @else
+                                    <span class="text-danger">Habis</span>
+                                @endif
+                            </p>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Quantity & Add to Cart -->
-            @if($product->stock > 0 && $product->status != 'sold_out')
-            <form action="{{ route('cart.add') }}" method="POST">
-                @csrf
-                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                <div class="card border-primary mb-4">
-                    <div class="card-body">
-                        <div class="row g-3 align-items-center">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Quantity:</label>
-                                <div class="input-group">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">
-                                        <i class="fas fa-minus"></i>
-                                    </button>
-                                    <input type="number" 
-                                           name="quantity"
-                                           id="quantity" 
-                                           class="form-control text-center" 
-                                           value="1" 
-                                           min="1" 
-                                           max="{{ $product->stock }}">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
+                    <!-- Short Description -->
+                    @if($product->short_description)
+                        <div class="alert alert-light mb-4">
+                            <i class="fas fa-info-circle text-primary"></i>
+                            {{ $product->short_description }}
+                        </div>
+                    @endif
+
+                    <!-- Add to Cart Form -->
+                    @if($product->stock > 0)
+                        <form action="{{ route('cart.add') }}" method="POST" id="addToCartForm">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                            
+                            <div class="row g-3 mb-3">
+                                <!-- Quantity -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Jumlah:</label>
+                                    <div class="input-group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="decreaseQty()">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" name="quantity" id="quantity" 
+                                               class="form-control text-center" 
+                                               value="1" min="1" max="{{ $product->stock }}">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="increaseQty()">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Subtotal -->
+                                <div class="col-md-8">
+                                    <label class="form-label fw-semibold">Subtotal:</label>
+                                    <h4 class="text-primary fw-bold mb-0" id="subtotal">
+                                        Rp {{ number_format($product->discount_price ?? $product->price, 0, ',', '.') }}
+                                    </h4>
                                 </div>
                             </div>
-                            <div class="col-md-8">
-                                <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-shopping-cart me-2"></i>
-                                    Add to Cart
+
+                            <!-- Buttons -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-cart-plus"></i> Tambah ke Keranjang
                                 </button>
+                                <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left"></i> Kembali ke Produk
+                                </a>
                             </div>
+                        </form>
+                    @else
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Maaf, produk ini sedang habis
                         </div>
-                    </div>
-                </div>
-            </form>
-            @else
-            <div class="alert alert-secondary">
-                <i class="fas fa-info-circle me-2"></i>
-                This product is currently out of stock
-            </div>
-            @endif
+                    @endif
 
-            <!-- Quick Actions -->
-            <div class="d-flex gap-2 mb-4">
-                <button class="btn btn-outline-danger btn-lg flex-fill" onclick="addToWishlist()">
-                    <i class="fas fa-heart me-2"></i> Wishlist
-                </button>
-                <button class="btn btn-outline-secondary btn-lg" onclick="shareProduct()">
-                    <i class="fas fa-share-alt"></i>
-                </button>
-            </div>
-
-            <!-- Product Meta -->
-            <div class="border-top pt-4">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <small class="text-muted">SKU:</small>
-                        <div class="fw-bold">{{ $product->code }}</div>
-                    </div>
-                    <div class="col-6">
-                        <small class="text-muted">Category:</small>
-                        <div class="fw-bold">{{ $product->category->name }}</div>
+                    <!-- Product Stats -->
+                    <div class="row mt-4 pt-4 border-top">
+                        <div class="col-6 text-center">
+                            <i class="fas fa-eye text-muted fs-4"></i>
+                            <p class="mb-0 mt-2">{{ $product->views }} views</p>
+                        </div>
+                        <div class="col-6 text-center">
+                            <i class="fas fa-weight-hanging text-muted fs-4"></i>
+                            <p class="mb-0 mt-2">{{ $product->weight ?? 0 }}g</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Product Description & Details -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" 
-                            data-bs-toggle="tab" 
-                            data-bs-target="#description" 
-                            type="button">
-                        <i class="fas fa-info-circle me-2"></i>Description
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" 
-                            data-bs-toggle="tab" 
-                            data-bs-target="#specifications" 
-                            type="button">
-                        <i class="fas fa-list me-2"></i>Specifications
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" 
-                            data-bs-toggle="tab" 
-                            data-bs-target="#reviews" 
-                            type="button">
-                        <i class="fas fa-star me-2"></i>Reviews
-                    </button>
-                </li>
-            </ul>
-
-            <div class="tab-content border border-top-0 p-4">
-                <!-- Description -->
-                <div class="tab-pane fade show active" id="description">
-                    @if($product->description)
-                        <div class="product-description">
-                            {!! $product->description !!}
+    <!-- Product Description -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#description">
+                                <i class="fas fa-info-circle"></i> Deskripsi
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="description">
+                            {!! nl2br(e($product->description)) !!}
                         </div>
-                    @else
-                        <p class="text-muted">No description available.</p>
-                    @endif
-                </div>
-
-                <!-- Specifications -->
-                <div class="tab-pane fade" id="specifications">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th style="width: 30%">Product Code</th>
-                                <td>{{ $product->code }}</td>
-                            </tr>
-                            <tr>
-                                <th>Category</th>
-                                <td>{{ $product->category->name }}</td>
-                            </tr>
-                            <tr>
-                                <th>Weight</th>
-                                <td>
-                                    @if($product->weight)
-                                        {{ $product->weight >= 1000 ? number_format($product->weight/1000, 2) . ' kg' : $product->weight . ' gram' }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Stock Status</th>
-                                <td>
-                                    @if($product->stock > 10)
-                                        <span class="badge bg-success">In Stock</span>
-                                    @elseif($product->stock > 0)
-                                        <span class="badge bg-warning">Limited Stock</span>
-                                    @else
-                                        <span class="badge bg-danger">Out of Stock</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Availability</th>
-                                <td>{{ ucfirst($product->status) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Reviews -->
-                <div class="tab-pane fade" id="reviews">
-                    <div class="text-center py-5 text-muted">
-                        <i class="fas fa-comment-dots fa-3x mb-3"></i>
-                        <p class="mb-0">No reviews yet. Be the first to review this product!</p>
-                        <button class="btn btn-primary mt-3">Write a Review</button>
                     </div>
                 </div>
             </div>
@@ -329,147 +211,117 @@
 
     <!-- Related Products -->
     @if($relatedProducts->count() > 0)
-    <div class="mt-5">
-        <h3 class="mb-4">Related Products</h3>
-        <div class="row g-4">
-            @foreach($relatedProducts as $relatedProduct)
-            <div class="col-md-3">
-                <div class="card h-100 product-card">
-                    <img src="{{ $relatedProduct->image_url }}" 
-                         class="card-img-top" 
-                         alt="{{ $relatedProduct->name }}"
-                         style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h6 class="card-title">{{ Str::limit($relatedProduct->name, 50) }}</h6>
-                        <p class="text-success fw-bold mb-2">{{ $relatedProduct->formatted_price }}</p>
-                        <a href="/products/{{ $relatedProduct->slug }}" class="btn btn-sm btn-outline-primary w-100">
-                            View Details
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h4 class="fw-bold mb-4">
+                    <i class="fas fa-th-large text-primary"></i> Produk Terkait
+                </h4>
+            </div>
+
+            @foreach($relatedProducts as $related)
+                <div class="col-md-3 mb-4">
+                    <div class="card product-card h-100">
+                        <a href="{{ route('products.show', $related->slug) }}">
+                            <img src="{{ $related->image ? asset('storage/' . $related->image) : 'https://via.placeholder.com/300x250' }}" 
+                                 class="card-img-top" 
+                                 alt="{{ $related->name }}">
                         </a>
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a href="{{ route('products.show', $related->slug) }}" 
+                                   class="text-dark text-decoration-none">
+                                    {{ Str::limit($related->name, 40) }}
+                                </a>
+                            </h6>
+                            <h5 class="text-primary fw-bold">
+                                Rp {{ number_format($related->discount_price ?? $related->price, 0, ',', '.') }}
+                            </h5>
+                        </div>
                     </div>
                 </div>
-            </div>
             @endforeach
         </div>
-    </div>
     @endif
 </div>
+@endsection
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-// Change main image
-function changeMainImage(imageUrl) {
-    document.getElementById('mainProductImage').src = imageUrl;
-    
-    // Update active thumbnail
-    document.querySelectorAll('.thumbnail-item').forEach(thumb => {
-        thumb.classList.remove('active');
-    });
-    event.target.classList.add('active');
-}
-
-// Quantity controls
-function increaseQty() {
-    const input = document.getElementById('quantity');
-    const max = parseInt(input.max);
-    const current = parseInt(input.value);
-    if (current < max) {
-        input.value = current + 1;
-    }
-}
-
-function decreaseQty() {
-    const input = document.getElementById('quantity');
-    const current = parseInt(input.value);
-    if (current > 1) {
-        input.value = current - 1;
-    }
-}
-
-// Add to wishlist
-function addToWishlist() {
-    Swal.fire({
-        icon: 'success',
-        title: 'Added to Wishlist!',
-        text: 'Product added to your wishlist',
-        timer: 2000,
-        showConfirmButton: false
-    });
-}
-
-// Share product
-function shareProduct() {
-    if (navigator.share) {
-        navigator.share({
-            title: '{{ $product->name }}',
-            text: '{{ $product->short_description }}',
-            url: window.location.href
-        });
-    } else {
-        // Fallback - copy to clipboard
-        navigator.clipboard.writeText(window.location.href);
-        Swal.fire({
-            icon: 'success',
-            title: 'Link Copied!',
-            text: 'Product link copied to clipboard',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
-}
-
-@if(session('success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Success!',
-        text: '{{ session('success') }}',
-        timer: 2000,
-        showConfirmButton: false
-    });
-@endif
-
-@if(session('error'))
-    Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: '{{ session('error') }}',
-    });
-@endif
-</script>
-
+@push('styles')
 <style>
-.main-image {
-    position: relative;
-}
-
-.thumbnail-item {
-    border: 2px solid transparent;
-    transition: all 0.3s;
-}
-
-.thumbnail-item:hover,
-.thumbnail-item.active {
-    border-color: #0d6efd;
-}
-
-.product-card {
-    transition: transform 0.3s;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-}
-
-.product-description img {
-    max-width: 100%;
-    height: auto;
-}
-
-.product-description ul,
-.product-description ol {
-    padding-left: 1.5rem;
-}
+    .thumbnail-img {
+        cursor: pointer;
+        opacity: 0.6;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    
+    .thumbnail-img:hover,
+    .thumbnail-img.active {
+        opacity: 1;
+        border-color: var(--primary-color);
+    }
 </style>
 @endpush
-@endsection
+
+@push('scripts')
+<script>
+    const price = {{ $product->discount_price ?? $product->price }};
+    const maxStock = {{ $product->stock }};
+
+    // Change main image
+    function changeImage(src) {
+        document.getElementById('main-image').src = src;
+        
+        // Update active thumbnail
+        document.querySelectorAll('.thumbnail-img').forEach(img => {
+            img.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+
+    // Increase quantity
+    function increaseQty() {
+        let qty = document.getElementById('quantity');
+        let current = parseInt(qty.value);
+        if (current < maxStock) {
+            qty.value = current + 1;
+            updateSubtotal();
+        }
+    }
+
+    // Decrease quantity
+    function decreaseQty() {
+        let qty = document.getElementById('quantity');
+        let current = parseInt(qty.value);
+        if (current > 1) {
+            qty.value = current - 1;
+            updateSubtotal();
+        }
+    }
+
+    // Update subtotal
+    function updateSubtotal() {
+        let qty = parseInt(document.getElementById('quantity').value);
+        let subtotal = price * qty;
+        document.getElementById('subtotal').textContent = 
+            'Rp ' + subtotal.toLocaleString('id-ID');
+    }
+
+    // Handle quantity input change
+    document.getElementById('quantity').addEventListener('change', function() {
+        if (this.value > maxStock) this.value = maxStock;
+        if (this.value < 1) this.value = 1;
+        updateSubtotal();
+    });
+
+    // Handle form submit
+    document.getElementById('addToCartForm').addEventListener('submit', function() {
+        const btn = this.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menambahkan...';
+        
+        setTimeout(() => {
+            updateCartCount();
+        }, 500);
+    });
+</script>
+@endpush

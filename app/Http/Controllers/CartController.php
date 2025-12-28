@@ -2,34 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
     /**
-     * Display cart page
+     * Display shopping cart
      */
     public function index()
     {
-        $cart = session()->get('cart', []);
-        $cartItems = [];
-        $subtotal = 0;
-
-        foreach ($cart as $id => $item) {
-            $product = Product::find($id);
-            if ($product) {
-                $cartItems[] = [
-                    'product' => $product,
-                    'quantity' => $item['quantity'],
-                    'subtotal' => $product->final_price * $item['quantity'],
-                ];
-                $subtotal += $product->final_price * $item['quantity'];
-            }
+        if (Auth::check()) {
+            // Untuk user yang login
+            $cartItems = Cart::with('product')
+                ->where('user_id', Auth::id())
+                ->get();
+        } else {
+            // Untuk guest (session-based cart)
+            $cartItems = collect(session('cart', []));
         }
 
-        // Shipping cost (flat rate untuk simplicity)
-        $shippingCost = $subtotal > 0 ? 50000 : 0;
+        $subtotal = $cartItems->sum(function($item) {
+            return $item->price * $item->quantity;
+        });
+
+        $shippingCost = 0; // Bisa dihitung dinamis
         $total = $subtotal + $shippingCost;
 
         return view('cart.index', compact('cartItems', 'subtotal', 'shippingCost', 'total'));
@@ -42,38 +42,60 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:1'
         ]);
 
         $product = Product::findOrFail($request->product_id);
 
         // Check stock
         if ($product->stock < $request->quantity) {
-            return back()->with('error', 'Stok tidak mencukupi!');
+            return back()->with('error', 'Stok tidak mencukupi. Tersedia: ' . $product->stock);
         }
 
-        $cart = session()->get('cart', []);
+        if (Auth::check()) {
+            // User yang login - simpan ke database
+            $cart = Cart::where('user_id', Auth::id())
+                ->where('product_id', $product->id)
+                ->first();
 
-        // If product already in cart, update quantity
-        if (isset($cart[$product->id])) {
-            $newQuantity = $cart[$product->id]['quantity'] + $request->quantity;
+            if ($cart) {
+                // Update quantity jika sudah ada
+                $newQuantity = $cart->quantity + $request->quantity;
+                
+                if ($newQuantity > $product->stock) {
+                    return back()->with('error', 'Jumlah melebihi stok tersedia');
+                }
+                
+                $cart->update(['quantity' => $newQuantity]);
+            } else {
+                // Tambah item baru
+                Cart::create([
+                    'user_id' => Auth::id(),
+                    'product_id' => $product->id,
+                    'quantity' => $request->quantity,
+                    'price' => $product->discount_price ?? $product->price
+                ]);
+            }
+        } else {
+            // Guest - simpan ke session
+            $cart = session('cart', []);
             
-            // Check if new quantity exceeds stock
-            if ($newQuantity > $product->stock) {
-                return back()->with('error', 'Jumlah melebihi stok yang tersedia!');
+            if (isset($cart[$product->id])) {
+                $cart[$product->id]['quantity'] += $request->quantity;
+            } else {
+                $cart[$product->id] = [
+                    'product_id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->discount_price ?? $product->price,
+                    'quantity' => $request->quantity,
+                    'image' => $product->image
+                ];
             }
             
-            $cart[$product->id]['quantity'] = $newQuantity;
-        } else {
-            // Add new product to cart
-            $cart[$product->id] = [
-                'quantity' => $request->quantity,
-            ];
+            session(['cart' => $cart]);
         }
 
-        session()->put('cart', $cart);
-
-        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
     }
 
     /**
@@ -83,25 +105,38 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:1'
         ]);
 
         $product = Product::findOrFail($request->product_id);
 
-        // Check stock
         if ($product->stock < $request->quantity) {
-            return back()->with('error', 'Stok tidak mencukupi!');
+            return response()->json([
+                'success' => false,
+                'message' => 'Stok tidak mencukupi'
+            ], 400);
         }
 
-        $cart = session()->get('cart', []);
+        if (Auth::check()) {
+            $cart = Cart::where('user_id', Auth::id())
+                ->where('product_id', $request->product_id)
+                ->first();
 
-        if (isset($cart[$product->id])) {
-            $cart[$product->id]['quantity'] = $request->quantity;
-            session()->put('cart', $cart);
-            return back()->with('success', 'Keranjang berhasil diupdate!');
+            if ($cart) {
+                $cart->update(['quantity' => $request->quantity]);
+            }
+        } else {
+            $cart = session('cart', []);
+            if (isset($cart[$request->product_id])) {
+                $cart[$request->product_id]['quantity'] = $request->quantity;
+                session(['cart' => $cart]);
+            }
         }
 
-        return back()->with('error', 'Produk tidak ditemukan di keranjang!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Keranjang berhasil diupdate'
+        ]);
     }
 
     /**
@@ -109,33 +144,45 @@ class CartController extends Controller
      */
     public function remove($productId)
     {
-        $cart = session()->get('cart', []);
-
-        if (isset($cart[$productId])) {
+        if (Auth::check()) {
+            Cart::where('user_id', Auth::id())
+                ->where('product_id', $productId)
+                ->delete();
+        } else {
+            $cart = session('cart', []);
             unset($cart[$productId]);
-            session()->put('cart', $cart);
-            return back()->with('success', 'Produk berhasil dihapus dari keranjang!');
+            session(['cart' => $cart]);
         }
 
-        return back()->with('error', 'Produk tidak ditemukan di keranjang!');
+        return back()->with('success', 'Item berhasil dihapus dari keranjang');
     }
 
     /**
-     * Clear cart
+     * Clear all cart
      */
     public function clear()
     {
-        session()->forget('cart');
-        return back()->with('success', 'Keranjang berhasil dikosongkan!');
+        if (Auth::check()) {
+            Cart::where('user_id', Auth::id())->delete();
+        } else {
+            session()->forget('cart');
+        }
+
+        return back()->with('success', 'Keranjang berhasil dikosongkan');
     }
 
     /**
-     * Get cart count (for navbar)
+     * Get cart count (for navbar badge)
      */
     public function count()
     {
-        $cart = session()->get('cart', []);
-        $count = array_sum(array_column($cart, 'quantity'));
+        if (Auth::check()) {
+            $count = Cart::where('user_id', Auth::id())->sum('quantity');
+        } else {
+            $cart = session('cart', []);
+            $count = array_sum(array_column($cart, 'quantity'));
+        }
+
         return response()->json(['count' => $count]);
     }
 }

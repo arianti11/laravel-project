@@ -45,6 +45,26 @@ class User extends Authenticatable
     }
 
     // ============================================
+    // RELATIONSHIPS
+    // ============================================
+
+    /**
+     * Relasi ke Cart
+     */
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
+
+    /**
+     * Relasi ke Orders
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // ============================================
     // SCOPES
     // ============================================
 
@@ -151,6 +171,40 @@ class User extends Authenticatable
         ][$this->role] ?? 'Unknown';
     }
 
+    /**
+     * ACCESSOR: Get cart total amount
+     */
+    public function getCartTotalAttribute()
+    {
+        return $this->carts()->with('product')->get()->sum('subtotal');
+    }
+
+    /**
+     * ACCESSOR: Get cart items count
+     */
+    public function getCartCountAttribute()
+    {
+        return $this->carts()->sum('quantity');
+    }
+
+    /**
+     * ACCESSOR: Get total orders
+     */
+    public function getTotalOrdersAttribute()
+    {
+        return $this->orders()->count();
+    }
+
+    /**
+     * ACCESSOR: Get total spent
+     */
+    public function getTotalSpentAttribute()
+    {
+        return $this->orders()
+            ->where('payment_status', 'paid')
+            ->sum('total');
+    }
+
     // ============================================
     // METHODS - Role Checking
     // ============================================
@@ -254,5 +308,45 @@ class User extends Authenticatable
     public function toggleStatus()
     {
         $this->update(['is_active' => !$this->is_active]);
+    }
+
+    // ============================================
+    // METHODS - Cart & Orders
+    // ============================================
+
+    /**
+     * Get active cart items
+     */
+    public function getCartItems()
+    {
+        return $this->carts()->with('product')->get();
+    }
+
+    /**
+     * Clear user cart
+     */
+    public function clearCart()
+    {
+        return $this->carts()->delete();
+    }
+
+    /**
+     * Get pending orders
+     */
+    public function getPendingOrders()
+    {
+        return $this->orders()
+            ->where('status', 'pending')
+            ->get();
+    }
+
+    /**
+     * Get completed orders
+     */
+    public function getCompletedOrders()
+    {
+        return $this->orders()
+            ->where('status', 'delivered')
+            ->get();
     }
 }

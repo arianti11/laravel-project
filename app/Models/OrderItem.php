@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderItem extends Model
 {
@@ -16,40 +16,28 @@ class OrderItem extends Model
         'product_code',
         'price',
         'quantity',
-        'subtotal',
+        'subtotal'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'quantity' => 'integer',
-        'subtotal' => 'decimal:2',
+        'subtotal' => 'decimal:2'
     ];
 
-    // ============================================
-    // RELATIONSHIPS
-    // ============================================
-
+    /**
+     * Relasi ke Order
+     */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
+    /**
+     * Relasi ke Product
+     */
     public function product()
     {
         return $this->belongsTo(Product::class);
-    }
-
-    // ============================================
-    // ACCESSORS
-    // ============================================
-
-    public function getFormattedPriceAttribute()
-    {
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
-    }
-
-    public function getFormattedSubtotalAttribute()
-    {
-        return 'Rp ' . number_format($this->subtotal, 0, ',', '.');
     }
 }

@@ -4,22 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
      * Display user's order history
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::where('user_id', auth()->id())
-            ->with('items.product')
-            ->latest()
+        $query = Order::where('user_id', Auth::id())
+            ->with('items.product');
+
+        // Filter by status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        // Filter by payment status
+        if ($request->has('payment_status') && $request->payment_status != '') {
+            $query->where('payment_status', $request->payment_status);
+        }
+
+        // Search by order number
+        if ($request->has('search') && $request->search != '') {
+            $query->where('order_number', 'like', '%' . $request->search . '%');
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return view('orders.index', compact('orders'));
@@ -30,9 +42,9 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        // Check if order belongs to current user
-        if ($order->user_id !== auth()->id() && !auth()->user()->isAdminOrStaff()) {
-            abort(403, 'Unauthorized access to this order');
+        // Check authorization
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
         }
 
         $order->load('items.product');
@@ -45,18 +57,26 @@ class OrderController extends Controller
      */
     public function cancel(Order $order)
     {
-        // Check if order belongs to current user
-        if ($order->user_id !== auth()->id()) {
-            abort(403);
+        // Check authorization
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
         }
 
-        // Can only cancel pending orders
+        // Only pending orders can be cancelled
         if ($order->status !== 'pending') {
-            return back()->with('error', 'Order tidak dapat dibatalkan!');
+            return back()->with('error', 'Pesanan tidak dapat dibatalkan');
         }
 
-        $order->cancel();
+        // Update order status
+        $order->update([
+            'status' => 'cancelled'
+        ]);
 
-        return back()->with('success', 'Order berhasil dibatalkan!');
+        // Restore product stock
+        foreach ($order->items as $item) {
+            $item->product->increment('stock', $item->quantity);
+        }
+
+        return back()->with('success', 'Pesanan berhasil dibatalkan');
     }
 }

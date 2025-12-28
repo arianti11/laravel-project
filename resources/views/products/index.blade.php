@@ -1,464 +1,211 @@
-@extends('layouts.public')
+@extends('layouts.customer')
 
-@section('title', $product->name)
+@section('title', 'Products - UMKM Shop')
 
 @section('content')
-<div class="container py-5">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item"><a href="/products">Products</a></li>
-            <li class="breadcrumb-item"><a href="/products?category={{ $product->category->slug }}">{{ $product->category->name }}</a></li>
-            <li class="breadcrumb-item active">{{ $product->name }}</li>
-        </ol>
-    </nav>
+<div class="container">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2 class="fw-bold mb-3">
+                <i class="fas fa-shopping-bag text-primary"></i> Produk Kami
+            </h2>
+            <p class="text-muted">Temukan produk UMKM berkualitas pilihan Anda</p>
+        </div>
+    </div>
 
-    <div class="row g-5">
-        <!-- Product Images -->
-        <div class="col-lg-6">
-            <div class="product-images">
-                <!-- Main Image -->
-                <div class="main-image mb-3">
-                    <img id="mainProductImage" 
-                         src="{{ $product->image_url }}" 
-                         alt="{{ $product->name }}"
-                         class="img-fluid rounded shadow"
-                         style="width: 100%; height: 500px; object-fit: cover;">
-                    
-                    <!-- Badges -->
-                    <div class="position-absolute top-0 start-0 m-3">
-                        @if($product->is_on_sale)
-                        <span class="badge bg-danger fs-6 mb-2">
-                            SALE {{ $product->discount_percentage }}%
-                        </span>
-                        @endif
-                        
-                        @if($product->status == 'preorder')
-                        <span class="badge bg-warning fs-6">
-                            Pre-Order
-                        </span>
-                        @elseif($product->status == 'sold_out' || $product->stock == 0)
-                        <span class="badge bg-secondary fs-6">
-                            Sold Out
-                        </span>
-                        @elseif($product->stock <= 5)
-                        <span class="badge bg-warning fs-6">
-                            Only {{ $product->stock }} Left!
-                        </span>
-                        @endif
-                    </div>
-                </div>
+    <!-- Filters & Search -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <form action="{{ route('products.index') }}" method="GET" class="row g-3">
+                        <!-- Search -->
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" name="search" class="form-control" 
+                                       placeholder="Cari produk..." value="{{ request('search') }}">
+                            </div>
+                        </div>
 
-                <!-- Thumbnail Gallery -->
-                @if($product->images->count() > 0)
-                <div class="row g-2 thumbnail-gallery">
-                    <!-- Main Image Thumbnail -->
-                    <div class="col-3">
-                        <img src="{{ $product->image_url }}" 
-                             alt="{{ $product->name }}"
-                             class="img-thumbnail thumbnail-item active"
-                             onclick="changeMainImage('{{ $product->image_url }}')"
-                             style="cursor: pointer; height: 100px; object-fit: cover; width: 100%;">
-                    </div>
-                    
-                    <!-- Additional Images -->
-                    @foreach($product->images as $image)
-                    <div class="col-3">
-                        <img src="{{ $image->image_url }}" 
-                             alt="{{ $product->name }}"
-                             class="img-thumbnail thumbnail-item"
-                             onclick="changeMainImage('{{ $image->image_url }}')"
-                             style="cursor: pointer; height: 100px; object-fit: cover; width: 100%;">
-                    </div>
-                    @endforeach
+                        <!-- Category Filter -->
+                        <div class="col-md-3">
+                            <select name="category" class="form-select">
+                                <option value="">Semua Kategori</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" 
+                                        {{ request('category') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Status Filter -->
+                        <div class="col-md-2">
+                            <select name="status" class="form-select">
+                                <option value="">Semua Status</option>
+                                <option value="ready" {{ request('status') == 'ready' ? 'selected' : '' }}>Ready</option>
+                                <option value="preorder" {{ request('status') == 'preorder' ? 'selected' : '' }}>Pre-Order</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort -->
+                        <div class="col-md-2">
+                            <select name="sort" class="form-select">
+                                <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Terbaru</option>
+                                <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>Terpopuler</option>
+                                <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Harga Terendah</option>
+                                <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Harga Tertinggi</option>
+                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Nama (A-Z)</option>
+                            </select>
+                        </div>
+
+                        <!-- Button -->
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                @endif
             </div>
         </div>
+    </div>
 
-        <!-- Product Info -->
-        <div class="col-lg-6">
-            <!-- Category -->
-            <div class="mb-2">
-                <a href="/products?category={{ $product->category->slug }}" 
-                   class="badge bg-primary text-decoration-none">
-                    <i class="fas fa-tag me-1"></i>
-                    {{ $product->category->name }}
-                </a>
-            </div>
+    <!-- Products Grid -->
+    @if($products->count() > 0)
+        <div class="row">
+            @foreach($products as $product)
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card product-card h-100">
+                        <!-- Product Image -->
+                        <a href="{{ route('products.show', $product->slug) }}">
+                            <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x250' }}" 
+                                 class="card-img-top" 
+                                 alt="{{ $product->name }}">
+                        </a>
 
-            <!-- Product Name -->
-            <h1 class="display-5 fw-bold mb-3">{{ $product->name }}</h1>
-
-            <!-- Code & Views -->
-            <div class="d-flex align-items-center text-muted mb-3">
-                <small class="me-3">
-                    <i class="fas fa-barcode me-1"></i>
-                    {{ $product->code }}
-                </small>
-                <small>
-                    <i class="fas fa-eye me-1"></i>
-                    {{ $product->views }} views
-                </small>
-            </div>
-
-            <!-- Short Description -->
-            @if($product->short_description)
-            <p class="lead text-muted mb-4">{{ $product->short_description }}</p>
-            @endif
-
-            <!-- Price -->
-            <div class="mb-4">
-                @if($product->is_on_sale)
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <h2 class="text-success fw-bold mb-0">{{ $product->formatted_discount_price }}</h2>
-                    <h4 class="text-muted text-decoration-line-through mb-0">{{ $product->formatted_price }}</h4>
-                    <span class="badge bg-danger fs-6">
-                        Save {{ $product->discount_percentage }}%
-                    </span>
-                </div>
-                @else
-                <h2 class="text-success fw-bold mb-2">{{ $product->formatted_price }}</h2>
-                @endif
-            </div>
-
-            <!-- Stock & Status -->
-            <div class="mb-4">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="text-muted small mb-1">Stock</div>
-                            @if($product->stock > 10)
-                                <div class="h5 text-success mb-0">
-                                    <i class="fas fa-check-circle me-1"></i>
-                                    Available
-                                </div>
-                            @elseif($product->stock > 0)
-                                <div class="h5 text-warning mb-0">
-                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                    {{ $product->stock }} left
-                                </div>
-                            @else
-                                <div class="h5 text-danger mb-0">
-                                    <i class="fas fa-times-circle me-1"></i>
-                                    Sold Out
-                                </div>
+                        <!-- Badges -->
+                        <div class="position-absolute top-0 end-0 p-2">
+                            @if($product->discount_price)
+                                <span class="badge bg-danger">
+                                    DISKON {{ number_format((($product->price - $product->discount_price) / $product->price) * 100, 0) }}%
+                                </span>
+                            @endif
+                            
+                            @if($product->status == 'preorder')
+                                <span class="badge bg-warning text-dark">Pre-Order</span>
+                            @elseif($product->stock == 0)
+                                <span class="badge bg-secondary">Sold Out</span>
                             @endif
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="border rounded p-3 text-center">
-                            <div class="text-muted small mb-1">Weight</div>
-                            <div class="h5 mb-0">
-                                @if($product->weight)
-                                    {{ $product->weight >= 1000 ? number_format($product->weight/1000, 1) . ' kg' : $product->weight . ' gr' }}
+
+                        <div class="card-body d-flex flex-column">
+                            <!-- Category -->
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-tag"></i> {{ $product->category->name }}
+                            </p>
+
+                            <!-- Product Name -->
+                            <h6 class="card-title mb-2">
+                                <a href="{{ route('products.show', $product->slug) }}" 
+                                   class="text-dark text-decoration-none">
+                                    {{ Str::limit($product->name, 50) }}
+                                </a>
+                            </h6>
+
+                            <!-- Price -->
+                            <div class="mb-3">
+                                @if($product->discount_price)
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h5 class="text-primary mb-0 fw-bold">
+                                            Rp {{ number_format($product->discount_price, 0, ',', '.') }}
+                                        </h5>
+                                        <small class="text-muted text-decoration-line-through">
+                                            Rp {{ number_format($product->price, 0, ',', '.') }}
+                                        </small>
+                                    </div>
                                 @else
-                                    -
+                                    <h5 class="text-primary mb-0 fw-bold">
+                                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                                    </h5>
+                                @endif
+                            </div>
+
+                            <!-- Stock Info -->
+                            <p class="small text-muted mb-3">
+                                <i class="fas fa-box"></i> Stok: {{ $product->stock }}
+                            </p>
+
+                            <!-- Actions -->
+                            <div class="mt-auto">
+                                @if($product->stock > 0)
+                                    <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form">
+                                        @csrf
+                                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-cart-plus"></i> Add to Cart
+                                        </button>
+                                    </form>
+                                @else
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="fas fa-times"></i> Sold Out
+                                    </button>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endforeach
+        </div>
 
-            <!-- Quantity & Add to Cart -->
-            @if($product->stock > 0 && $product->status != 'sold_out')
-            <div class="card border-primary mb-4">
-                <div class="card-body">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold">Quantity:</label>
-                            <div class="input-group">
-                                <button class="btn btn-outline-secondary" type="button" onclick="decreaseQty()">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" 
-                                       id="quantity" 
-                                       class="form-control text-center" 
-                                       value="1" 
-                                       min="1" 
-                                       max="{{ $product->stock }}">
-                                <button class="btn btn-outline-secondary" type="button" onclick="increaseQty()">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <button class="btn btn-primary btn-lg w-100" onclick="addToCart()">
-                                <i class="fas fa-shopping-cart me-2"></i>
-                                Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @else
-            <div class="alert alert-secondary">
-                <i class="fas fa-info-circle me-2"></i>
-                This product is currently out of stock
-            </div>
-            @endif
-
-            <!-- Quick Actions -->
-            <div class="d-flex gap-2 mb-4">
-                <button class="btn btn-outline-danger btn-lg flex-fill" onclick="addToWishlist()">
-                    <i class="fas fa-heart me-2"></i> Wishlist
-                </button>
-                <button class="btn btn-outline-secondary btn-lg" onclick="shareProduct()">
-                    <i class="fas fa-share-alt"></i>
-                </button>
-            </div>
-
-            <!-- Product Meta -->
-            <div class="border-top pt-4">
-                <div class="row g-3">
-                    <div class="col-6">
-                        <small class="text-muted">SKU:</small>
-                        <div class="fw-bold">{{ $product->code }}</div>
-                    </div>
-                    <div class="col-6">
-                        <small class="text-muted">Category:</small>
-                        <div class="fw-bold">{{ $product->category->name }}</div>
-                    </div>
+        <!-- Pagination -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-center">
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Product Description & Details -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" 
-                            data-bs-toggle="tab" 
-                            data-bs-target="#description" 
-                            type="button">
-                        <i class="fas fa-info-circle me-2"></i>Description
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" 
-                            data-bs-toggle="tab" 
-                            data-bs-target="#specifications" 
-                            type="button">
-                        <i class="fas fa-list me-2"></i>Specifications
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" 
-                            data-bs-toggle="tab" 
-                            data-bs-target="#reviews" 
-                            type="button">
-                        <i class="fas fa-star me-2"></i>Reviews
-                    </button>
-                </li>
-            </ul>
-
-            <div class="tab-content border border-top-0 p-4">
-                <!-- Description -->
-                <div class="tab-pane fade show active" id="description">
-                    @if($product->description)
-                        <div class="product-description">
-                            {!! $product->description !!}
-                        </div>
-                    @else
-                        <p class="text-muted">No description available.</p>
-                    @endif
-                </div>
-
-                <!-- Specifications -->
-                <div class="tab-pane fade" id="specifications">
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <th style="width: 30%">Product Code</th>
-                                <td>{{ $product->code }}</td>
-                            </tr>
-                            <tr>
-                                <th>Category</th>
-                                <td>{{ $product->category->name }}</td>
-                            </tr>
-                            <tr>
-                                <th>Weight</th>
-                                <td>
-                                    @if($product->weight)
-                                        {{ $product->weight >= 1000 ? number_format($product->weight/1000, 2) . ' kg' : $product->weight . ' gram' }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Stock Status</th>
-                                <td>
-                                    @if($product->stock > 10)
-                                        <span class="badge bg-success">In Stock</span>
-                                    @elseif($product->stock > 0)
-                                        <span class="badge bg-warning">Limited Stock</span>
-                                    @else
-                                        <span class="badge bg-danger">Out of Stock</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Availability</th>
-                                <td>{{ ucfirst($product->status) }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Reviews -->
-                <div class="tab-pane fade" id="reviews">
-                    <div class="text-center py-5 text-muted">
-                        <i class="fas fa-comment-dots fa-3x mb-3"></i>
-                        <p class="mb-0">No reviews yet. Be the first to review this product!</p>
-                        <button class="btn btn-primary mt-3">Write a Review</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Related Products -->
-    @if($relatedProducts->count() > 0)
-    <div class="mt-5">
-        <h3 class="mb-4">Related Products</h3>
-        <div class="row g-4">
-            @foreach($relatedProducts as $relatedProduct)
-            <div class="col-md-3">
-                <div class="card h-100 product-card">
-                    <img src="{{ $relatedProduct->image_url }}" 
-                         class="card-img-top" 
-                         alt="{{ $relatedProduct->name }}"
-                         style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-                        <h6 class="card-title">{{ Str::limit($relatedProduct->name, 50) }}</h6>
-                        <p class="text-success fw-bold mb-2">{{ $relatedProduct->formatted_price }}</p>
-                        <a href="/products/{{ $relatedProduct->slug }}" class="btn btn-sm btn-outline-primary w-100">
-                            View Details
+    @else
+        <!-- Empty State -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">Produk Tidak Ditemukan</h4>
+                        <p class="text-muted">Coba ubah filter atau kata kunci pencarian Anda</p>
+                        <a href="{{ route('products.index') }}" class="btn btn-primary mt-3">
+                            <i class="fas fa-redo"></i> Reset Filter
                         </a>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
-    </div>
     @endif
 </div>
+@endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// Change main image
-function changeMainImage(imageUrl) {
-    document.getElementById('mainProductImage').src = imageUrl;
-    
-    // Update active thumbnail
-    document.querySelectorAll('.thumbnail-item').forEach(thumb => {
-        thumb.classList.remove('active');
+// Add to cart with AJAX (optional enhancement)
+document.querySelectorAll('.add-to-cart-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const btn = this.querySelector('button');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+        
+        // Update cart count after form submission
+        setTimeout(() => {
+            updateCartCount();
+        }, 500);
     });
-    event.target.classList.add('active');
-}
-
-// Quantity controls
-function increaseQty() {
-    const input = document.getElementById('quantity');
-    const max = parseInt(input.max);
-    const current = parseInt(input.value);
-    if (current < max) {
-        input.value = current + 1;
-    }
-}
-
-function decreaseQty() {
-    const input = document.getElementById('quantity');
-    const current = parseInt(input.value);
-    if (current > 1) {
-        input.value = current - 1;
-    }
-}
-
-// Add to cart
-function addToCart() {
-    const qty = document.getElementById('quantity').value;
-    Swal.fire({
-        icon: 'success',
-        title: 'Added to Cart!',
-        text: `${qty} item(s) added to your cart`,
-        timer: 2000,
-        showConfirmButton: false
-    });
-}
-
-// Add to wishlist
-function addToWishlist() {
-    Swal.fire({
-        icon: 'success',
-        title: 'Added to Wishlist!',
-        text: 'Product added to your wishlist',
-        timer: 2000,
-        showConfirmButton: false
-    });
-}
-
-// Share product
-function shareProduct() {
-    if (navigator.share) {
-        navigator.share({
-            title: '{{ $product->name }}',
-            text: '{{ $product->short_description }}',
-            url: window.location.href
-        });
-    } else {
-        // Fallback - copy to clipboard
-        navigator.clipboard.writeText(window.location.href);
-        Swal.fire({
-            icon: 'success',
-            title: 'Link Copied!',
-            text: 'Product link copied to clipboard',
-            timer: 2000,
-            showConfirmButton: false
-        });
-    }
-}
+});
 </script>
-
-<style>
-.main-image {
-    position: relative;
-}
-
-.thumbnail-item {
-    border: 2px solid transparent;
-    transition: all 0.3s;
-}
-
-.thumbnail-item:hover,
-.thumbnail-item.active {
-    border-color: #0d6efd;
-}
-
-.product-card {
-    transition: transform 0.3s;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-}
-
-.product-description img {
-    max-width: 100%;
-    height: auto;
-}
-
-.product-description ul,
-.product-description ol {
-    padding-left: 1.5rem;
-}
-</style>
 @endpush
-@endsection

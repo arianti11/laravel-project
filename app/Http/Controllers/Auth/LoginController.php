@@ -33,10 +33,13 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Redirect berdasarkan role
+            // Redirect berdasarkan role (3 roles)
             if (auth()->user()->isAdmin()) {
                 return redirect()->route('admin.dashboard')
                     ->with('success', 'Selamat datang, Admin ' . auth()->user()->name . '!');
+            } elseif (auth()->user()->isStaff()) {
+                return redirect()->route('staff.dashboard')
+                    ->with('success', 'Selamat datang, Staff ' . auth()->user()->name . '!');
             } else {
                 return redirect()->route('user.dashboard')
                     ->with('success', 'Selamat datang, ' . auth()->user()->name . '!');
