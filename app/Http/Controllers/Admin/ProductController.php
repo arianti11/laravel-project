@@ -127,6 +127,7 @@ class ProductController extends Controller
                 ]);
             }
         }
+        ActivityLogger::logCreate($product, "Created product: {$product->name}");
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Produk berhasil ditambahkan!');
@@ -206,6 +207,7 @@ class ProductController extends Controller
                 ]);
             }
         }
+        //ActivityLogger::logUpdate($product, $oldValues, "Updated product: {$product->name}");
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Produk berhasil diupdate!');
@@ -230,7 +232,7 @@ class ProductController extends Controller
 
             // Soft delete produk
             $product->delete();
-
+            ActivityLogger::logDelete($product, "Deleted product: {$product->name}");
             return redirect()->route('admin.products.index')
                 ->with('success', 'Produk berhasil dihapus!');
 
@@ -238,6 +240,7 @@ class ProductController extends Controller
             return redirect()->route('admin.products.index')
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+        
     }
 
     /**

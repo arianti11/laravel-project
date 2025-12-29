@@ -63,10 +63,29 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'register']);
 });
 
-// Logout
+// Logout - MUST be POST and authenticated
 Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout')
     ->middleware('auth');
+
+// Home redirect after login
+Route::get('/home', function () {
+    $user = auth()->user();
+    
+    if ($user->isAdmin()) {
+        return redirect()->route('admin.dashboard');
+    }
+    
+    if ($user->isStaff()) {
+        return redirect()->route('staff.dashboard');
+    }
+    
+    return redirect()->route('user.dashboard');
+})->middleware('auth')->name('home.redirect');
+
+// ==========================================
+// ADMIN ROUTES (Super User - Full Access)
+// ==========================================
 
 // ==========================================
 // ADMIN ROUTES (Super User - Full Access)
@@ -93,6 +112,14 @@ Route::prefix('admin')
         
         // Users Management (ADMIN ONLY)
         Route::resource('users', UserController::class);
+        
+        // 🔥 TAMBAHKAN INI - Order Management (ADMIN)
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', [App\Http\Controllers\Admin\OrderController::class, 'index'])->name('index');
+            Route::get('/{order}', [App\Http\Controllers\Admin\OrderController::class, 'show'])->name('show');
+            Route::patch('/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('updateStatus');
+            Route::patch('/{order}/payment', [App\Http\Controllers\Admin\OrderController::class, 'updatePayment'])->name('updatePayment');
+        });
         
         // Activity Logs (ADMIN ONLY)
         Route::get('/activity-logs', [AdminDashboardController::class, 'activityLogs'])

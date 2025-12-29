@@ -90,6 +90,11 @@ class ActivityLogger
     {
         $user = Auth::user();
         
+        // Check if user exists before logging
+        if (!$user) {
+            return null;
+        }
+        
         return ActivityLog::create([
             'user_id' => $user->id,
             'type' => 'logout',

@@ -5,64 +5,106 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Helpers\ActivityLogger;
+use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
     /**
-     * Menampilkan halaman login
+     * Show login form
      */
     public function showLoginForm()
     {
+        // Redirect if already logged in
+        if (Auth::check()) {
+            return $this->redirectBasedOnRole();
+        }
+
         return view('auth.login');
     }
 
     /**
-     * Proses login
+     * Handle login request
      */
     public function login(Request $request)
     {
-        // Validasi
-        $request->validate([
+        // Validation
+        $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:8',
+            'password' => 'required'
         ]);
 
-        $credentials = $request->only('email', 'password');
-        $remember = $request->has('remember');
+        // Remember me
+        $remember = $request->filled('remember');
 
+        // Attempt login
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Redirect berdasarkan role (3 roles)
-            if (auth()->user()->isAdmin()) {
-                return redirect()->route('admin.dashboard')
-                    ->with('success', 'Selamat datang, Admin ' . auth()->user()->name . '!');
-            } elseif (auth()->user()->isStaff()) {
-                return redirect()->route('staff.dashboard')
-                    ->with('success', 'Selamat datang, Staff ' . auth()->user()->name . '!');
-            } else {
-                return redirect()->route('user.dashboard')
-                    ->with('success', 'Selamat datang, ' . auth()->user()->name . '!');
-            }
+            // Log activity (optional - jika sudah ada ActivityLogger)
+            // ActivityLogger::logLogin(Auth::user());
+
+            // Redirect based on role
+            return $this->redirectBasedOnRole();
         }
 
+        // Login failed
         return back()->withErrors([
             'email' => 'Email atau password salah.',
-        ])->withInput();
+        ])->withInput($request->only('email'));
     }
 
     /**
-     * Logout
+     * Handle logout - FIXED VERSION
      */
     public function logout(Request $request)
     {
-        Auth::logout();
+        // Log activity before logout (optional)
+        // ActivityLogger::logLogout();
 
+        // Get the guard
+        $guard = Auth::guard();
+
+        // Logout user
+        $guard->logout();
+
+        // Invalidate session
         $request->session()->invalidate();
+
+        // Regenerate CSRF token
         $request->session()->regenerateToken();
 
-        return redirect()->route('home')
-            ->with('success', 'Anda telah logout');
+        // Flash all session data
+        Session::flush();
+
+        // Redirect to login with success message
+        return redirect()->route('login')
+            ->with('success', 'Logout berhasil');
+    }
+
+    /**
+     * Redirect user based on their role
+     */
+    protected function redirectBasedOnRole()
+    {
+        $user = Auth::user();
+
+        // Check if user is active
+        if (!$user->is_active) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->with('error', 'Akun Anda tidak aktif. Hubungi administrator.');
+        }
+
+        // Redirect based on role
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user->isStaff()) {
+            return redirect()->route('staff.dashboard');
+        }
+
+        // Default to user dashboard
+        return redirect()->route('user.dashboard');
     }
 }
