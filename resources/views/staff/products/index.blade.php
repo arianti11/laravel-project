@@ -8,11 +8,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold mb-0">Manage Products</h2>
-            <p class="text-muted">Kelola produk UMKM</p>
+            <p class="text-muted">View & Edit produk UMKM (Staff tidak bisa create/delete)</p>
         </div>
-        <!-- <a href="{{ route('staff.products.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Add Product
-        </a> -->
     </div>
 
     <!-- Search & Filter -->
@@ -142,10 +139,7 @@
                     <div class="card-body text-center py-5">
                         <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
                         <h4 class="text-muted">No Products Found</h4>
-                        <p class="text-muted">Start by adding your first product</p>
-                        <a href="{{ route('staff.products.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Add Product
-                        </a>
+                        <p class="text-muted">Tidak ada produk yang cocok dengan filter</p>
                     </div>
                 </div>
             </div>

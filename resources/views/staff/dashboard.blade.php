@@ -167,10 +167,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ route('staff.products.create') }}" class="btn btn-primary text-start">
-                            <i class="fas fa-plus"></i> Add New Product
-                        </a>
-                        <a href="{{ route('staff.products.index') }}" class="btn btn-outline-primary text-start">
+                        <a href="{{ route('staff.products.index') }}" class="btn btn-primary text-start">
                             <i class="fas fa-box"></i> Manage Products
                         </a>
                         <a href="{{ route('staff.reports.products') }}" class="btn btn-outline-secondary text-start">
