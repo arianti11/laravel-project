@@ -1,331 +1,172 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kerajinan Tangan UMKM - Handmade with Love</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <title>UMKM Shop - Belanja Produk Lokal</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* Override container untuk full width */
-        .hero .container,
-        .features .container,
-        .products .container,
-        .cta .container,
-        footer .container {
-            max-width: 100% !important;
-            padding-left: 5%;
-            padding-right: 5%;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        /* Navbar juga full width */
-        .navbar .container {
-            max-width: 100% !important;
-            padding-left: 3%;
-            padding-right: 3%;
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .btn-custom {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
     </style>
 </head>
-
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-hand-sparkles"></i> KraftiQu
+            <a class="navbar-brand fw-bold" href="{{ route('home') }}">
+                <i class="fas fa-store"></i> UMKM Shop
             </a>
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#beranda">Beranda</a>
+                        <a class="nav-link" href="{{ route('products.index') }}">Produk</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#produk">Produk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#tentang">Tentang</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#kontak">Kontak</a>
-                    </li>
-                    <li class="nav-item ms-3">
-                        <a href="{{ route('login') }}" class="btn btn-primary-custom">Masuk</a>
-                    </li>
+                    
+                    @auth
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('cart.index') }}">
+                                <i class="fas fa-shopping-cart"></i> Keranjang
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('user.dashboard') }}">Dashboard</a>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">
+                                <i class="fas fa-sign-in-alt"></i> Masuk
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm ms-2" href="{{ route('register') }}">
+                                Daftar
+                            </a>
+                        </li>
+                    @endauth
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero" id="beranda">
+    <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <h1>Kerajinan Tangan<br>Dibuat dengan <span style="color: var(--primary);">❤️ </span></h1>
-                    <p>Temukan koleksi kerajinan tangan unik dan berkualitas dari pengrajin lokal Indonesia. Setiap
-                        produk dibuat dengan penuh perhatian dan dedikasi.</p>
-                    <a href="#produk" class="btn btn-primary-custom me-3">
-                        <i class="fas fa-shopping-bag me-2"></i>Lihat Produk
-                    </a>
-                    <a href="#tentang" class="btn btn-outline-dark" style="border-radius: 50px; padding: 0.7rem 2rem;">
-                        Pelajari Lebih Lanjut
-                    </a>
+                    <h1 class="display-3 fw-bold mb-4">
+                        Belanja Produk UMKM Berkualitas
+                    </h1>
+                    <p class="lead mb-4">
+                        Dukung produk lokal Indonesia dengan berbelanja di UMKM Shop. 
+                        Temukan berbagai produk berkualitas dari UMKM seluruh Indonesia.
+                    </p>
+                    
+                    <div class="d-flex gap-3">
+                        <!-- 🔥 TOMBOL MASUK - INI YANG PENTING -->
+                        <a href="{{ route('products.index') }}" class="btn btn-light btn-custom btn-lg">
+                            <i class="fas fa-shopping-bag"></i> Mulai Belanja
+                        </a>
+                        
+                        @guest
+                            <a href="{{ route('login') }}" class="btn btn-outline-light btn-custom btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Masuk
+                            </a>
+                        @else
+                            <a href="{{ route('user.dashboard') }}" class="btn btn-outline-light btn-custom btn-lg">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        @endguest
+                    </div>
                 </div>
+                
                 <div class="col-lg-6 text-center">
-                    <div class="hero-image">
-                        <i class="fas fa-hand-holding-heart"
-                            style="font-size: 15rem; color: var(--secondary); opacity: 0.3;"></i>
-                    </div>
+                    <i class="fas fa-store fa-10x opacity-25"></i>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features -->
-    <section class="features" id="tentang">
+    <!-- Features Section -->
+    <section class="py-5 bg-light">
         <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="mb-3">Mengapa Memilih Kami?</h2>
-                <p class="text-muted">Komitmen kami untuk kualitas dan kepuasan pelanggan</p>
-            </div>
+            <h2 class="text-center fw-bold mb-5">Kenapa Belanja di UMKM Shop?</h2>
+            
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-hands"></i>
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-shield-alt fa-3x text-primary"></i>
                         </div>
-                        <h4>100% Handmade</h4>
-                        <p>Setiap produk dibuat dengan tangan oleh pengrajin berpengalaman, menjamin kualitas dan
-                            keunikan.</p>
+                        <h5 class="fw-bold">Produk Berkualitas</h5>
+                        <p class="text-muted">Semua produk telah diverifikasi dan berkualitas tinggi</p>
                     </div>
                 </div>
+                
                 <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-leaf"></i>
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-truck fa-3x text-success"></i>
                         </div>
-                        <h4>Ramah Lingkungan</h4>
-                        <p>Menggunakan bahan-bahan alami dan ramah lingkungan untuk produk yang berkelanjutan.</p>
+                        <h5 class="fw-bold">Gratis Ongkir</h5>
+                        <p class="text-muted">Gratis ongkir untuk pembelian minimal Rp 500.000</p>
                     </div>
                 </div>
+                
                 <div class="col-md-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-award"></i>
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-headset fa-3x text-warning"></i>
                         </div>
-                        <h4>Kualitas Premium</h4>
-                        <p>Standar kualitas tinggi dengan kontrol kualitas ketat untuk setiap produk yang kami jual.</p>
+                        <h5 class="fw-bold">Support 24/7</h5>
+                        <p class="text-muted">Tim support siap membantu kapan saja</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Products -->
-    <section class="products" id="produk">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="mb-3">Produk Unggulan</h2>
-                <p class="text-muted">Koleksi terbaik dari pengrajin kami</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-tshirt" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Batik Tulis Premium</h5>
-                            <p class="text-muted small">Kain batik tulis dengan motif tradisional</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 350.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-gem" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Perhiasan Etnik</h5>
-                            <p class="text-muted small">Kalung handmade dengan desain etnik</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 150.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-paint-brush" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Lukisan Kanvas</h5>
-                            <p class="text-muted small">Lukisan abstrak dengan cat akrilik</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 500.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-vase" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Vas Keramik</h5>
-                            <p class="text-muted small">Vas keramik dengan glasir natural</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 200.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-shopping-basket" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Tas Anyaman</h5>
-                            <p class="text-muted small">Tas rotan anyaman tangan berkualitas</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 275.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-couch" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Bantal Dekoratif</h5>
-                            <p class="text-muted small">Bantal dengan bordir tangan yang indah</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 125.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-palette" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Keramik Hias</h5>
-                            <p class="text-muted small">Keramik dengan motif tradisional</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 180.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="product-card">
-                        <div class="product-image d-flex align-items-center justify-content-center">
-                            <i class="fas fa-hat-wizard" style="font-size: 5rem; color: white;"></i>
-                        </div>
-                        <div class="product-body">
-                            <h5 class="product-title">Topi Anyaman</h5>
-                            <p class="text-muted small">Topi pandan untuk pantai</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="product-price">Rp 95.000</span>
-                                <a href="{{ route('register') }}" class="btn btn-light-custom">
-                                    <button class="btn btn-sm btn-primary-custom">Detail</button>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta">
-        <div class="container">
-            <h2>Siap Mulai Berbelanja Kerajinan Yang Anda Sukai?</h2>
-            <p class="mb-4">Bergabunglah dan Jadi Membership di UMKM Kami!</p>
-            <a href="{{ route('register') }}" class="btn btn-light-custom">
-                <i class="fas fa-user-plus me-2"></i>Daftar Sekarang
-            </a>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer id="kontak">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="mb-3">KraftiQu</h5>
-                    <p class="list-unstyled">Platform manajemen produk untuk UMKM kerajinan tangan Indonesia.</p>
-                    <div class="social-icons mt-3">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4 footer-links">
-                    <h5 class="mb-3">Menu</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#beranda">Beranda</a></li>
-                        <li class="mb-2"><a href="#produk">Produk</a></li>
-                        <li class="mb-2"><a href="#tentang">Tentang Kami</a></li>
-                        <li class="mb-2"><a href="#kontak">Kontak</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5 class="mb-3">Kontak</h5>
-                    <p class="list-unstyled">
-                        <i class="fas fa-map-marker-alt me-2"></i>Pekanbaru, Riau<br>
-                        <i class="fas fa-phone me-2"></i>+62 812-3456-7890<br>
-                        <i class="fas fa-envelope me-2"></i>info@kraftiqu.com
-                    </p>
-                </div>
-            </div>
-            <hr style="border-color: rgba(223, 221, 221, 0.89);">
-            <div class="text-center list-unstyled pb-3">
-                <p class="mb-0">&copy; 2024 KraftiQu. Made with ❤️ in Indonesia</p>
-            </div>
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 UMKM Shop. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('assets/js/script.js') }}"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

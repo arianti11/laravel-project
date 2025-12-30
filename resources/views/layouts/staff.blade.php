@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Staff Panel') - {{ config('app.name') }}</title>
-    
-    <!-- Bootstrap 5 -->
+    <title>@yield('title', 'Staff Panel') - UMKM Shop</title>
+
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
@@ -15,303 +15,218 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --sidebar-width: 250px;
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
+            --staff-color: #f59e0b;
+            --staff-dark: #d97706;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
+            background-color: #f3f4f6;
         }
-        
-        #wrapper {
-            display: flex;
-        }
-        
-        #sidebar {
-            min-height: 100vh;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+
+        /* Sidebar */
+        .sidebar {
             position: fixed;
             top: 0;
             left: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(180deg, var(--staff-color) 0%, var(--staff-dark) 100%);
+            color: white;
+            padding-top: 20px;
             z-index: 1000;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
         }
-        
-        #content-wrapper {
-            flex: 1;
-            margin-left: var(--sidebar-width);
+
+        .sidebar-brand {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-brand h4 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background: rgba(255,255,255,0.1);
+            border-left-color: white;
+        }
+
+        .sidebar-menu li a i {
+            width: 25px;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
             min-height: 100vh;
         }
-        
-        .sidebar-brand {
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.1);
-        }
-        
-        .nav-item {
-            margin: 0.3rem 0.8rem;
-        }
-        
-        .nav-link {
-            color: rgba(255,255,255,0.85);
-            padding: 0.75rem 1rem;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            border-radius: 0.5rem;
-            transition: all 0.3s;
-            font-size: 0.95rem;
-        }
-        
-        .nav-link:hover {
-            color: white;
-            background-color: rgba(255,255,255,0.15);
-            transform: translateX(5px);
-        }
-        
-        .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.2);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .nav-link i {
-            width: 20px;
-            margin-right: 12px;
-            font-size: 1.1rem;
-        }
-        
-        .nav-section {
-            padding: 0.5rem 1.5rem 0.3rem;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .topbar {
-            height: 70px;
+
+        /* Navbar */
+        .navbar-top {
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
         }
-        
-        .user-dropdown {
-            cursor: pointer;
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.3s;
         }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+
+        .card:hover {
+            transform: translateY(-5px);
         }
-        
-        @media (max-width: 768px) {
-            #sidebar {
-                margin-left: calc(var(--sidebar-width) * -1);
-            }
-            
-            #sidebar.show {
-                margin-left: 0;
-            }
-            
-            #content-wrapper {
-                margin-left: 0;
-            }
+
+        /* Badges */
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        /* Alert */
+        .alert {
+            border-radius: 10px;
+            border: none;
         }
     </style>
-    
+
     @stack('styles')
 </head>
 <body>
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <nav id="sidebar">
-            <!-- Brand -->
-            <a class="sidebar-brand" href="{{ route('staff.dashboard') }}">
-                <i class="fas fa-user-tie me-2"></i>
-                <span>STAFF PANEL</span>
-            </a>
-            
-            <!-- Nav Items -->
-            <ul class="nav flex-column py-3">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('staff.dashboard') ? 'active' : '' }}" 
-                       href="{{ route('staff.dashboard') }}">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                
-                <li class="nav-section">KELOLA DATA</li>
-                
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('staff.products.*') ? 'active' : '' }}" 
-                       href="{{ route('staff.products.index') }}">
-                        <i class="fas fa-box"></i>
-                        <span>Produk</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Orders</span>
-                        <span class="badge bg-warning ms-auto">3</span>
-                    </a>
-                </li>
-                
-                <li class="nav-section">LAPORAN</li>
-                
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('staff.reports.products') ? 'active' : '' }}" 
-                       href="{{ route('staff.reports.products') }}">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Laporan Produk</span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('staff.reports.orders') ? 'active' : '' }}" 
-                       href="{{ route('staff.reports.orders') }}">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Laporan Order</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h4>
+                <i class="fas fa-store"></i>
+                UMKM Shop
+            </h4>
+            <small>Staff Panel</small>
+        </div>
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper">
-            <!-- Topbar -->
-            <nav class="topbar navbar navbar-expand navbar-light">
-                <div class="container-fluid">
-                    <button class="btn btn-link d-md-none" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ route('staff.dashboard') }}" class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('staff.products.index') }}" class="{{ request()->routeIs('staff.products.*') ? 'active' : '' }}">
+                    <i class="fas fa-box"></i>
+                    Products
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('staff.reports.products') }}" class="{{ request()->routeIs('staff.reports.*') ? 'active' : '' }}">
+                    <i class="fas fa-chart-bar"></i>
+                    Reports
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="navbar-top d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0 fw-bold">@yield('title', 'Dashboard')</h5>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <!-- User Info -->
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle"></i>
+                        {{ auth()->user()->name }}
                     </button>
-                    
-                    <!-- Breadcrumb or Title -->
-                    <div class="d-none d-md-block">
-                        <h5 class="mb-0">@yield('title', 'Dashboard')</h5>
-                    </div>
-                    
-                    <ul class="navbar-nav ms-auto align-items-center">
-                        <!-- Notifications -->
-                        <li class="nav-item dropdown me-3">
-                            <a class="nav-link position-relative" data-bs-toggle="dropdown">
-                                <i class="fas fa-bell fa-lg text-muted"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    3
-                                </span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><h6 class="dropdown-header">Notifications</h6></li>
-                                <li><a class="dropdown-item" href="#">New order received</a></li>
-                                <li><a class="dropdown-item" href="#">Product stock low</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-center" href="#">View All</a></li>
-                            </ul>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <span class="dropdown-item-text">
+                                <small class="text-muted">Logged in as</small><br>
+                                <strong>{{ auth()->user()->email }}</strong>
+                            </span>
                         </li>
-                        
-                        <!-- User Info -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle user-dropdown d-flex align-items-center" 
-                               data-bs-toggle="dropdown">
-                                <div class="user-avatar me-2">
-                                    {{ auth()->user()->initials }}
-                                </div>
-                                <div class="d-none d-lg-block text-start">
-                                    <div class="fw-bold" style="font-size: 0.9rem;">
-                                        {{ auth()->user()->name }}
-                                    </div>
-                                    <small class="text-muted">Staff</small>
-                                </div>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('home') }}">
+                                <i class="fas fa-home"></i> Home
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
-                                        Profile Saya
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="fas fa-cog fa-sm fa-fw me-2 text-gray-400"></i>
-                                        Settings
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item">
-                                            <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>
-                                            Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
+                        </li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>
-            </nav>
-
-            <!-- Main Content -->
-            <div class="container-fluid py-4">
-                <!-- Alert Messages -->
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-
-                @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-
-                @yield('content')
             </div>
+        </nav>
 
-            <!-- Footer -->
-            <footer class="text-center py-4 bg-white mt-5 border-top">
-                <span class="text-muted">© {{ date('Y') }} {{ config('app.name') }} - Staff Panel</span>
-            </footer>
+        <!-- Content -->
+        <div class="container-fluid px-4">
+            <!-- Alert Messages -->
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            <!-- Page Content -->
+            @yield('content')
         </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Sidebar Toggle -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Auto dismiss alerts -->
     <script>
-        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('show');
-        });
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
     </script>
-    
+
     @stack('scripts')
 </body>
 </html>

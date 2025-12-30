@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.staff')
 
 @section('title', 'Tambah Produk')
 
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('staff.products.create') }}" method="POST" enctype="multipart/form-data">
         @csrf
         
         <div class="row">
