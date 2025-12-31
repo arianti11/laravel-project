@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Staff\DashboardController as StaffDashboardController;
 use App\Http\Controllers\Staff\ProductController as StaffProductController;
+use App\Http\Controllers\Staff\OrderController as StaffOrderController;
 use App\Http\Controllers\User\UserDashboardController;
 
 /*
@@ -162,7 +163,7 @@ Route::prefix('staff')
             ->name('products.images.delete');
         
         //Orders Management (Staff bisa manage orders)
-        Route::resource('orders', OrderController::class); // Nanti dibuat
+        //Route::prefix('orders', OrderController::class); // Nanti dibuat
          // 🔥 ORDERS - TAMBAHKAN INI
         Route::get('/orders', [App\Http\Controllers\Staff\OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [App\Http\Controllers\Staff\OrderController::class, 'show'])->name('orders.show');
