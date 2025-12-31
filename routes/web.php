@@ -163,6 +163,10 @@ Route::prefix('staff')
         
         //Orders Management (Staff bisa manage orders)
         Route::resource('orders', OrderController::class); // Nanti dibuat
+         // 🔥 ORDERS - TAMBAHKAN INI
+        Route::get('/orders', [App\Http\Controllers\Staff\OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [App\Http\Controllers\Staff\OrderController::class, 'show'])->name('orders.show');
+        Route::patch('/orders/{order}/status', [App\Http\Controllers\Staff\OrderController::class, 'updateStatus'])->name('orders.updateStatus');
         
         // Reports (STAFF - View Only, Limited)
         Route::prefix('reports')->name('reports.')->group(function () {

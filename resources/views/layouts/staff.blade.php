@@ -140,6 +140,12 @@
                 </a>
             </li>
             <li>
+                <a href="{{ route('staff.orders.index') }}" class="{{ request()->routeIs('staff.orders.*') ? 'active' : '' }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    Orders
+                </a>
+            </li>
+            <li>
                 <a href="{{ route('staff.reports.products') }}" class="{{ request()->routeIs('staff.reports.products') ? 'active' : '' }}">
                     <i class="fas fa-chart-bar"></i>
                     Products Report

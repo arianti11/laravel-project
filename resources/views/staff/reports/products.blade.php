@@ -178,7 +178,7 @@
                                                     <span class="badge bg-warning">Pre-Order</span>
                                                 @else
                                                     <span class="badge bg-secondary">Sold Out</span>
-                                                @endif
+                                                 @endif
                                             </td>
                                             <td class="text-center">
                                                 <a href="{{ route('staff.products.edit', $product->id) }}" 
