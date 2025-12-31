@@ -161,8 +161,8 @@ Route::prefix('staff')
         Route::delete('/products/images/{image}', [StaffProductController::class, 'deleteImage'])
             ->name('products.images.delete');
         
-        // Orders Management (Staff bisa manage orders)
-        // Route::resource('orders', OrderController::class); // Nanti dibuat
+        //Orders Management (Staff bisa manage orders)
+        Route::resource('orders', OrderController::class); // Nanti dibuat
         
         // Reports (STAFF - View Only, Limited)
         Route::prefix('reports')->name('reports.')->group(function () {

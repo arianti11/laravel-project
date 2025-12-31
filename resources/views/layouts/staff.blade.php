@@ -140,9 +140,15 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('staff.reports.products') }}" class="{{ request()->routeIs('staff.reports.*') ? 'active' : '' }}">
+                <a href="{{ route('staff.reports.products') }}" class="{{ request()->routeIs('staff.reports.products') ? 'active' : '' }}">
                     <i class="fas fa-chart-bar"></i>
-                    Reports
+                    Products Report
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('staff.reports.orders') }}" class="{{ request()->routeIs('staff.reports.orders') ? 'active' : '' }}">
+                    <i class="fas fa-file-alt"></i>
+                    Orders Report
                 </a>
             </li>
         </ul>
