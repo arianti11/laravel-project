@@ -182,11 +182,11 @@
                             </span>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li>
+                        <!-- <li>
                             <a class="dropdown-item" href="{{ route('home') }}">
                                 <i class="fas fa-home"></i> Home
                             </a>
-                        </li>
+                        </li> -->
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf

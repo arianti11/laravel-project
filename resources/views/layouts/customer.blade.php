@@ -192,11 +192,11 @@
                                         <i class="fas fa-tachometer-alt"></i> Dashboard
                                     </a>
                                 </li>
-                                <li>
+                                <!-- <li>
                                     <a class="dropdown-item" href="{{ route('user.profile') }}">
                                         <i class="fas fa-user"></i> Profile
                                     </a>
-                                </li>
+                                </li> -->
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">

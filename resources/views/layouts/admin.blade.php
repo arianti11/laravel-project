@@ -175,17 +175,17 @@
                     </a>
                 </li>
                 
-                <li class="nav-item mt-2">
+                <!-- <li class="nav-item mt-2">
                     <div class="px-3 text-white-50 small mb-2">SYSTEM</div>
-                </li>
+                </li> -->
                 
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
                        href="{{ route('admin.settings.index') }}">
                         <i class="fas fa-cog"></i>
                         <span>Settings</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
         </nav>
 
@@ -209,12 +209,12 @@
                                 <span class="badge bg-danger">Admin</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
+                                <!-- <li>
                                     <a class="dropdown-item" href="#">
                                         <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
                                         Profile
                                     </a>
-                                </li>
+                                </li> -->
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
