@@ -200,6 +200,7 @@ Route::prefix('user')
         // Route::get('/orders', [UserDashboardController::class, 'orders'])->name('orders');
         // Route::get('/orders/{order}', [UserDashboardController::class, 'orderDetail'])->name('orders.show');
     });
+    
 
 // ==========================================
 // REDIRECT SETELAH LOGIN (Berdasarkan Role)
