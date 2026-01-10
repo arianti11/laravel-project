@@ -144,7 +144,7 @@
                             <!-- Actions -->
                             <div class="mt-auto">
                                 @if($product->stock > 0)
-                                    <form action="{{ route('cart.add') }}" method="POST" class="add-to-cart-form">
+                                    <form action="{{ route('cart.add', $product->id) }}" method="POST" id="addToCartForm">
                                         @csrf
                                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                                         <input type="hidden" name="quantity" value="1">

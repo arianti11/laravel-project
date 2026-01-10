@@ -88,8 +88,8 @@ class ProductController extends Controller
             'weight' => 'nullable|integer|min:0',
             'status' => 'required|in:ready,preorder,sold_out',
             'is_published' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            'images.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'image' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'category_id.required' => 'Kategori wajib dipilih',
             'name.required' => 'Nama produk wajib diisi',
@@ -169,8 +169,8 @@ class ProductController extends Controller
             'weight' => 'nullable|integer|min:0',
             'status' => 'required|in:ready,preorder,sold_out',
             'is_published' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            'images.*' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'image' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ]);
 
         // Update slug jika nama berubah

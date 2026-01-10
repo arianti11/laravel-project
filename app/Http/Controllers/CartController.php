@@ -6,183 +6,157 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
     /**
-     * Display shopping cart
+     * Constructor - Middleware untuk proteksi
+     */
+    public function __construct()
+    {
+        // Semua method di CartController harus login
+        $this->middleware('auth');
+    }
+
+    /**
+     * Display cart
      */
     public function index()
     {
-        if (Auth::check()) {
-            // Untuk user yang login
-            $cartItems = Cart::with('product')
-                ->where('user_id', Auth::id())
-                ->get();
-        } else {
-            // Untuk guest (session-based cart)
-            $cartItems = collect(session('cart', []));
-        }
+        $cartItems = Cart::with('product')
+            ->where('user_id', Auth::id())
+            ->get();
 
-        $subtotal = $cartItems->sum(function($item) {
-            return $item->price * $item->quantity;
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->subtotal;
         });
 
-        $shippingCost = 0; // Bisa dihitung dinamis
-        $total = $subtotal + $shippingCost;
-
-        return view('cart.index', compact('cartItems', 'subtotal', 'shippingCost', 'total'));
+        return view('cart.index', compact('cartItems', 'subtotal'));
     }
 
     /**
      * Add product to cart
      */
-    public function add(Request $request)
+    public function add(Request $request, $productId)
     {
+        // Validasi
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
+        ], [
+            'quantity.required' => 'Jumlah produk wajib diisi',
+            'quantity.integer' => 'Jumlah harus berupa angka',
+            'quantity.min' => 'Jumlah minimal 1',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $product = Product::findOrFail($productId);
 
-        // Check stock
+        // Cek stok
         if ($product->stock < $request->quantity) {
-            return back()->with('error', 'Stok tidak mencukupi. Tersedia: ' . $product->stock);
+            return back()->with('error', 'Stok tidak mencukupi! Tersedia: ' . $product->stock);
         }
 
-        if (Auth::check()) {
-            // User yang login - simpan ke database
-            $cart = Cart::where('user_id', Auth::id())
-                ->where('product_id', $product->id)
-                ->first();
+        // Cek apakah produk sudah ada di cart
+        $cartItem = Cart::where('user_id', Auth::id())
+            ->where('product_id', $productId)
+            ->first();
 
-            if ($cart) {
-                // Update quantity jika sudah ada
-                $newQuantity = $cart->quantity + $request->quantity;
-                
-                if ($newQuantity > $product->stock) {
-                    return back()->with('error', 'Jumlah melebihi stok tersedia');
-                }
-                
-                $cart->update(['quantity' => $newQuantity]);
-            } else {
-                // Tambah item baru
-                Cart::create([
-                    'user_id' => Auth::id(),
-                    'product_id' => $product->id,
-                    'quantity' => $request->quantity,
-                    'price' => $product->discount_price ?? $product->price
-                ]);
+        if ($cartItem) {
+            // Update quantity
+            $newQuantity = $cartItem->quantity + $request->quantity;
+
+            // Cek stok lagi
+            if ($product->stock < $newQuantity) {
+                return back()->with('error', 'Tidak bisa menambahkan. Total akan melebihi stok!');
             }
-        } else {
-            // Guest - simpan ke session
-            $cart = session('cart', []);
-            
-            if (isset($cart[$product->id])) {
-                $cart[$product->id]['quantity'] += $request->quantity;
-            } else {
-                $cart[$product->id] = [
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->discount_price ?? $product->price,
-                    'quantity' => $request->quantity,
-                    'image' => $product->image
-                ];
-            }
-            
-            session(['cart' => $cart]);
+
+            $cartItem->update([
+                'quantity' => $newQuantity,
+                'subtotal' => $newQuantity * $cartItem->price,
+            ]);
+
+            return back()->with('success', 'Jumlah produk di keranjang berhasil diupdate!');
         }
 
-        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
+        // Tambah ke cart
+        Cart::create([
+            'user_id' => Auth::id(),
+            'product_id' => $productId,
+            'quantity' => $request->quantity,
+            'price' => $product->discount_price ?? $product->price,
+            'subtotal' => $request->quantity * ($product->discount_price ?? $product->price),
+        ]);
+
+        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
     }
 
     /**
      * Update cart item quantity
      */
-    public function update(Request $request)
+    public function update(Request $request, $cartId)
     {
         $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1'
+            'quantity' => 'required|integer|min:1',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
+        $cartItem = Cart::where('id', $cartId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
-        if ($product->stock < $request->quantity) {
+        // Cek stok
+        if ($cartItem->product->stock < $request->quantity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Stok tidak mencukupi'
+                'message' => 'Stok tidak mencukupi! Tersedia: ' . $cartItem->product->stock
             ], 400);
         }
 
-        if (Auth::check()) {
-            $cart = Cart::where('user_id', Auth::id())
-                ->where('product_id', $request->product_id)
-                ->first();
+        // Update
+        $cartItem->update([
+            'quantity' => $request->quantity,
+            'subtotal' => $request->quantity * $cartItem->price,
+        ]);
 
-            if ($cart) {
-                $cart->update(['quantity' => $request->quantity]);
-            }
-        } else {
-            $cart = session('cart', []);
-            if (isset($cart[$request->product_id])) {
-                $cart[$request->product_id]['quantity'] = $request->quantity;
-                session(['cart' => $cart]);
-            }
-        }
+        // Hitung ulang total
+        $cartItems = Cart::where('user_id', Auth::id())->get();
+        $subtotal = $cartItems->sum('subtotal');
 
         return response()->json([
             'success' => true,
-            'message' => 'Keranjang berhasil diupdate'
+            'message' => 'Keranjang berhasil diupdate!',
+            'subtotal' => number_format($subtotal, 0, ',', '.'),
+            'item_subtotal' => number_format($cartItem->subtotal, 0, ',', '.'),
         ]);
     }
 
     /**
      * Remove item from cart
      */
-    public function remove($productId)
+    public function remove($cartId)
     {
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())
-                ->where('product_id', $productId)
-                ->delete();
-        } else {
-            $cart = session('cart', []);
-            unset($cart[$productId]);
-            session(['cart' => $cart]);
-        }
+        $cartItem = Cart::where('id', $cartId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
 
-        return back()->with('success', 'Item berhasil dihapus dari keranjang');
+        $cartItem->delete();
+
+        return back()->with('success', 'Produk berhasil dihapus dari keranjang!');
     }
 
     /**
-     * Clear all cart
+     * Clear all cart items
      */
     public function clear()
     {
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())->delete();
-        } else {
-            session()->forget('cart');
-        }
+        Cart::where('user_id', Auth::id())->delete();
 
-        return back()->with('success', 'Keranjang berhasil dikosongkan');
+        return back()->with('success', 'Keranjang berhasil dikosongkan!');
     }
-
-    /**
-     * Get cart count (for navbar badge)
-     */
     public function count()
     {
-        if (Auth::check()) {
-            $count = Cart::where('user_id', Auth::id())->sum('quantity');
-        } else {
-            $cart = session('cart', []);
-            $count = array_sum(array_column($cart, 'quantity'));
-        }
+        $count = Cart::where('user_id', Auth::id())->sum('quantity');
 
-        return response()->json(['count' => $count]);
+        return response()->json([
+            'count' => $count
+        ]);
     }
 }

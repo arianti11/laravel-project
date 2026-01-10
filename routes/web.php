@@ -32,12 +32,27 @@ Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']
 Route::get('/products/{slug}', [App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
 
 // Cart Routes
-Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove/{productId}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
-Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
-Route::get('/cart/count', [App\Http\Controllers\CartController::class, 'count'])->name('cart.count');
+// Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+// Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+// Route::post('/cart/update', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+// Route::delete('/cart/remove/{productId}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+// Route::delete('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+// Route::get('/cart/count', [App\Http\Controllers\CartController::class, 'count'])->name('cart.count');
+/*
+|--------------------------------------------------------------------------
+| Cart Routes - Semua harus login
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+    // Cart
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/update/{cart}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{cart}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
+});
 
 // Checkout Routes (Auth Required)
 Route::middleware('auth')->group(function () {
@@ -84,9 +99,6 @@ Route::get('/home', function () {
     return redirect()->route('user.dashboard');
 })->middleware('auth')->name('home.redirect');
 
-// ==========================================
-// ADMIN ROUTES (Super User - Full Access)
-// ==========================================
 
 // ==========================================
 // ADMIN ROUTES (Super User - Full Access)
