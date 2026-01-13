@@ -70,7 +70,7 @@
                         @endif
 
                         <!-- Register Form -->
-                        <form action="{{ route('register') }}" method="POST">
+                        <form action="{{ route('register') }}" method="POST" data-validate="true"> 
                             @csrf
                             
                             <!-- Nama Lengkap -->
@@ -225,6 +225,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/form-validation.js') }}"></script>
     
     <!-- Toggle Password -->
     <script>

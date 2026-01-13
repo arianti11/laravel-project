@@ -1,4 +1,4 @@
-@extends('layouts.staff')
+@extends('layouts.admin')
 
 @section('title', 'Tambah Produk')
 
@@ -18,7 +18,8 @@
             </div>
         </div>
 
-        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data" data-validate="true">
+            @csrf
             <div class="row">
                 <!-- Left Column -->
                 <div class="col-lg-8">
@@ -176,13 +177,13 @@
                             <!-- Additional Images -->
                             <div class="mb-3">
                                 <label class="form-label">Gambar Tambahan (Galeri)</label>
-                                <input type="file" name="additional_images[]" class="form-control @error('additional_images.*') is-invalid @enderror"
-                                    accept="image/jpeg,image/png,image/jpg,image/webp" multiple
-                                    onchange="previewAdditionalImages(event)">
-                                @error('additional_images.*')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">Pilih multiple file (Max 5 gambar, masing-masing max 2MB)</small>
+                                <input type="file" 
+                                    name="images[]" 
+                                    class="form-control @error('images.*') is-invalid @enderror"
+                                    accept="image/jpeg,image/png,image/jpg,image/webp" 
+                                    multiple>
+                            </div>
+
 
                                 <!-- Preview -->
                                 <div id="additionalImagesPreview" class="mt-2 row g-2"></div>
@@ -249,6 +250,32 @@
     </div>
 
     @push('scripts')
+<script>
+// Auto-refresh CSRF token every 2 minutes
+setInterval(function() {
+    fetch('/csrf-token')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('input[name="_token"]').value = data.token;
+        })
+        .catch(error => console.error('Error refreshing token:', error));
+}, 120000); // 2 minutes
+
+// Prevent double submit
+let isSubmitting = false;
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (isSubmitting) {
+        e.preventDefault();
+        return false;
+    }
+    isSubmitting = true;
+});
+
+// Script lainnya...
+</script>
+@endpush
+    @push('scripts')
+    <script src="{{ asset('js/form-validation.js') }}"></script>
         <script>
             // Preview main image
             function previewMainImage(event) {

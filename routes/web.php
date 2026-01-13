@@ -213,6 +213,9 @@ Route::prefix('user')
         // Route::get('/orders/{order}', [UserDashboardController::class, 'orderDetail'])->name('orders.show');
     });
     
+Route::get('/csrf-token', function() {
+    return response()->json(['token' => csrf_token()]);
+});
 
 // ==========================================
 // REDIRECT SETELAH LOGIN (Berdasarkan Role)

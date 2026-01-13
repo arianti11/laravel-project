@@ -69,7 +69,7 @@
                         @endif
 
                         <!-- Login Form -->
-                        <form action="{{ route('login') }}" method="POST">
+                        <form action="{{ route('login') }}" method="POST" data-validate="true"> 
                             @csrf
                             
                             <!-- Email -->
@@ -168,6 +168,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/form-validation.js') }}"></script>
     
     <!-- Toggle Password -->
     <script>

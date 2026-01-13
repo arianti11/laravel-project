@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <form action="{{ route('checkout.process') }}" method="POST" id="checkoutForm">
+    <form action="{{ route('checkout.process') }}" method="POST" id="checkoutForm" data-validate="true">
         @csrf
         
         <div class="row">
@@ -359,6 +359,7 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <script>
     // Form validation & submit handling
     document.getElementById('checkoutForm').addEventListener('submit', function() {

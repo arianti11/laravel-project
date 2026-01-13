@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.categories.store') }}" method="POST" enctype="multipart/form-data" data-validate="true">
         @csrf
         
         <div class="row">
@@ -142,6 +142,7 @@
 </div>
 
 @push('scripts')
+<script src="{{ asset('js/form-validation.js') }}"></script>
 <script>
 function previewIcon(event) {
     const file = event.target.files[0];
