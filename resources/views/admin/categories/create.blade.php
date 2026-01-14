@@ -142,7 +142,7 @@
 </div>
 
 @push('scripts')
-<script src="{{ asset('js/form-validation.js') }}"></script>
+<script src="{{ asset('assets/js/form-validation.js') }}"></script>
 <script>
 function previewIcon(event) {
     const file = event.target.files[0];

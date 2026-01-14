@@ -359,7 +359,7 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/form-validation.js') }}"></script>
+<script src="{{ asset('assets/js/form-validation.js') }}"></script>
 <script>
     // Form validation & submit handling
     document.getElementById('checkoutForm').addEventListener('submit', function() {

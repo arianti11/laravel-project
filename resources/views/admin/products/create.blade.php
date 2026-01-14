@@ -275,7 +275,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
 </script>
 @endpush
     @push('scripts')
-    <script src="{{ asset('js/form-validation.js') }}"></script>
+    <script src="{{ asset('assets/js/form-validation.js') }}"></script>
         <script>
             // Preview main image
             function previewMainImage(event) {

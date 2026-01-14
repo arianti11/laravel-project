@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 // Show alert
-                showValidationAlert('Mohon lengkapi semua field yang wajib diisi!');
+                showValidationAlert('⚠️ Mohon lengkapi semua field yang wajib diisi!');
                 
                 return false;
             }
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Required validation
         if (field.hasAttribute('required')) {
             if (!value || (fieldType === 'file' && field.files.length === 0)) {
-                showError(field, fieldName + ' wajib diisi');
+                showError(field, '⚠️ Silakan isi bagian ' + fieldName);
                 return false;
             }
         }
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Email validation
         if (fieldType === 'email' && value) {
             if (!validateEmail(value)) {
-                showError(field, 'Format email tidak valid (contoh: nama@email.com)');
+                showError(field, '❌ Email tidak valid. Contoh yang benar: nama@email.com');
                 return false;
             }
         }
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (field.name === 'password_confirmation') {
             const password = document.querySelector('input[name="password"]');
             if (password && password.value !== value) {
-                showError(field, 'Konfirmasi password tidak cocok');
+                showError(field, '❌ Password tidak cocok! Silakan ketik ulang password yang sama');
                 return false;
             }
         }
@@ -168,17 +168,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const fieldName = getFieldLabel(field);
         
         if (isNaN(value)) {
-            showError(field, fieldName + ' harus berupa angka');
+            showError(field, '⚠️ ' + fieldName + ' harus diisi dengan angka');
             return false;
         }
         
         if (min !== null && value < parseFloat(min)) {
-            showError(field, fieldName + ' tidak boleh kurang dari ' + min);
+            showError(field, '❌ ' + fieldName + ' minimal ' + min);
             return false;
         }
         
         if (max !== null && value > parseFloat(max)) {
-            showError(field, fieldName + ' tidak boleh lebih dari ' + max);
+            showError(field, '❌ ' + fieldName + ' maksimal ' + max);
             return false;
         }
         
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fieldName = getFieldLabel(field);
         
         if (files.length === 0 && field.hasAttribute('required')) {
-            showError(field, fieldName + ' wajib diupload');
+            showError(field, '⚠️ Silakan upload ' + fieldName);
             return false;
         }
         
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 if (!isValidType) {
-                    showError(field, 'Format file tidak didukung. Gunakan: ' + accept);
+                    showError(field, '❌ Format file tidak didukung. Gunakan: ' + accept.replace(/image\//g, '').toUpperCase());
                     field.value = '';
                     return false;
                 }
@@ -222,7 +222,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check file size
             if (file.size > maxSize) {
-                showError(field, 'Ukuran file ' + file.name + ' terlalu besar! Maksimal 2MB');
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                showError(field, '❌ File terlalu besar (' + sizeMB + 'MB)! Maksimal 2MB');
                 field.value = '';
                 return false;
             }
@@ -312,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const discount = parseFloat(this.value || 0);
                 
                 if (discount > 0 && discount >= price) {
-                    showError(this, 'Harga diskon harus lebih kecil dari harga normal');
+                    showError(this, '❌ Harga diskon harus lebih kecil dari harga normal!');
                     return;
                 }
             }
@@ -332,8 +333,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         field.addEventListener('blur', function() {
             const value = this.value;
-            if (value && (value.length < 10 || value.length > 15)) {
-                showError(this, 'Nomor telepon harus 10-15 digit');
+            if (value && value.length < 10) {
+                showError(this, '⚠️ Nomor telepon minimal 10 digit (contoh: 08123456789)');
+            } else if (value && value.length > 15) {
+                showError(this, '❌ Nomor telepon maksimal 15 digit');
             }
         });
     });
@@ -342,11 +345,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('input[name="postal_code"]').forEach(field => {
         field.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '');
+            if (this.value.length > 5) {
+                this.value = this.value.slice(0, 5);
+            }
         });
         
         field.addEventListener('blur', function() {
             if (this.value && this.value.length !== 5) {
-                showError(this, 'Kode pos harus 5 digit');
+                showError(this, '⚠️ Kode pos harus 5 digit (contoh: 12345)');
             }
         });
     });
